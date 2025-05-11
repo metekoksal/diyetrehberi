@@ -10,8 +10,73 @@
             prefHeight="400.0" prefWidth="600.0">
 
     <children>
-        <VBox fx:id="vbox" alignment="CENTER" spacing="20.0" prefWidth="400.0" AnchorPane.topAnchor="50.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
-            <Label fx:id="nameLabel"/>
-        </VBox>
+
+        <!-- Ana içerik alanı -->
+        <StackPane fx:id="contentPane"
+                   AnchorPane.topAnchor="0.0"
+                   AnchorPane.bottomAnchor="50.0"
+                   AnchorPane.leftAnchor="0.0"
+                   AnchorPane.rightAnchor="0.0">
+
+            <VBox fx:id="homePanel" alignment="CENTER">
+                <Label fx:id="nameLabel" text="🏠 Ana Sayfa"/>
+            </VBox>
+
+            <VBox fx:id="exercisePanel" alignment="CENTER" visible="false">
+                <Label text="💪 Egzersiz Ekle"/>
+            </VBox>
+
+            <VBox fx:id="foodPanel" alignment="CENTER" visible="false">
+                <Label text="🍽 Yemek Ekle"/>
+            </VBox>
+
+            <VBox fx:id="profilePanel" alignment="CENTER" visible="false">
+                <Label text="👤 Profil"/>
+
+                <!-- Hoşgeldin kısmı -->
+                <Label fx:id="userNameLabel" text="Hoşgeldin [Kullanıcı Adı]"/>
+
+                <!-- Yaş, Cinsiyet, Ağırlık ve Uzunluk bilgilerinin gösterilmesi -->
+                <Label fx:id="ageLabel" text="Yaş: [Yaş]" />
+                <Label fx:id="genderLabel" text="Cinsiyet: [Cinsiyet]" />
+
+                <!-- Ağırlık ve Uzunluk: Etiket ve Input alanları -->
+                <HBox alignment="CENTER">
+                    <Label text="Ağırlık: " />
+                    <Label fx:id="weightLabel" text="XX kg" />
+                    <TextField fx:id="weightField" visible="false" promptText="Yeni Ağırlık" />
+                    <!-- Replaced 'Düzenle' with a pencil emoji -->
+                    <Button fx:id="editWeightBtn" text="📝" onAction="#handleEditWeight"/>
+                </HBox>
+
+                <HBox alignment="CENTER">
+                    <Label text="Uzunluk: " />
+                    <Label fx:id="heightLabel" text="XX cm" />
+                    <TextField fx:id="heightField" visible="false" promptText="Yeni Uzunluk" />
+                    <!-- Replaced 'Düzenle' with a pencil emoji -->
+                    <Button fx:id="editHeightBtn" text="📝" onAction="#handleEditHeight"/>
+                </HBox>
+
+            </VBox>
+
+            <VBox fx:id="settingsPanel" alignment="CENTER" visible="false">
+                <Label text="⚙ Ayarlar"/>
+                <Button text="❌ Kullanıcıyı Sil" onAction="#handleRemoveUser"/>
+            </VBox>
+        </StackPane>
+
+        <!-- Alt Navigasyon Menüsü -->
+        <HBox alignment="CENTER" spacing="15.0"
+              style="-fx-background-color: #f0f0f0; -fx-padding: 10px;"
+              AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0">
+            <Button text="🏠" onAction="#handleHome"/>
+            <Button text="💪" onAction="#handleAddExercise"/>
+            <Button text="🍽" onAction="#handleAddFood"/>
+            <Button text="👤" onAction="#handleProfile"/>
+            <Button text="⚙" onAction="#handleSettings"/>
+        </HBox>
+
     </children>
 </AnchorPane>

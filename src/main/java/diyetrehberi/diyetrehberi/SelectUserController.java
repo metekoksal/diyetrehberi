@@ -56,7 +56,7 @@ public class SelectUserController implements Initializable {
         // Yeni Kullanıcı butonu
         Button newUserButton = new Button("Yeni Kullanıcı");
         newUserButton.setStyle("-fx-font-size: 14px; -fx-padding: 10px;");
-        newUserButton.setOnAction(e -> goToSignup());
+        newUserButton.setOnAction(_ -> goToSignup());
 
         userContainer.getChildren().add(newUserButton);
     }

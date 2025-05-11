@@ -102,4 +102,28 @@ public class Database {
     public void setCurrentUserId(int id) {
         currentUserId = id;
     }
+
+    public void updateUserHeight(int userId, double newHeight) {
+        String sql = "UPDATE users SET height = ? WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setDouble(1, newHeight);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+            System.out.println("Boy güncellendi: " + newHeight);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateUserWeight(int userId, double newWeight) {
+        String sql = "UPDATE users SET weight = ? WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setDouble(1, newWeight);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+            System.out.println("Ağırlık güncellendi: " + newWeight);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
