@@ -95,13 +95,10 @@ public class Database {
         }
     }
 
-
-    // Getter for the current user ID
     public int getCurrentUserId() {
         return currentUserId;
     }
 
-    // Setter to manually set the current user ID (if needed)
     public void setCurrentUserId(int id) {
         currentUserId = id;
     }
