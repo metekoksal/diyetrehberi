@@ -22,13 +22,76 @@
                 <Label fx:id="nameLabel" text="🏠 Ana Sayfa"/>
             </VBox>
 
-            <VBox fx:id="exercisePanel" alignment="CENTER" visible="false">
-                <Label text="💪 Egzersiz Ekle"/>
+            <VBox fx:id="exercisePanel" alignment="TOP_CENTER" visible="false">
+                <HBox spacing="10.0" alignment="TOP_CENTER">
+                    <!-- Sol: Dinamik Yemek Seçme Alanı -->
+                    <VBox alignment="CENTER" prefWidth="280.0" spacing="10.0">
+                        <Label text="💪 Egzersiz Kaydı Ekle" style="-fx-font-size: 16px; -fx-font-weight: bold;" AnchorPane.topAnchor="0.0"/>
+
+                        <!-- Dinamik olarak kodda eklenecek ComboBox -->
+                        <ComboBox fx:id="exerciseComboBox" promptText="Egzersiz Seçin" prefWidth="200.0"/>
+
+                        <!-- Porsiyon girişi -->
+                        <VBox spacing="5.0" alignment="TOP_LEFT">
+                            <HBox spacing="5.0" alignment="CENTER_LEFT">
+                                <Label text="Dakika:"/>
+                                <TextField fx:id="durationField" text="1" prefWidth="60.0"/>
+                            </HBox>
+                            <Label fx:id="caloriesBurnedLabel" text="Yakılan Kalori: 0 kcal"/>
+                        </VBox>
+
+                        <!-- Ekle butonu -->
+                        <Button text="➕ Ekle"/>
+                    </VBox>
+
+
+                    <!-- Orta Çizgi -->
+                    <Pane prefWidth="2.0" style="-fx-background-color: #cccccc;" />
+
+                    <!-- Sağ: Besin Değerleri Özeti -->
+                    <VBox alignment="TOP_CENTER" prefWidth="280.0" spacing="10.0">
+                        <Label text="📋 Özet" style="-fx-font-size: 16px; -fx-font-weight: bold;" AnchorPane.topAnchor="0.0"/>
+                    </VBox>
+                </HBox>
             </VBox>
 
-            <VBox fx:id="foodPanel" alignment="CENTER" visible="false">
-                <Label text="🍽 Yemek Ekle"/>
+            <VBox fx:id="foodPanel" alignment="TOP_CENTER" visible="false">
+                <HBox spacing="10.0" alignment="TOP_CENTER">
+                    <!-- Sol: Dinamik Yemek Seçme Alanı -->
+                    <VBox alignment="CENTER" prefWidth="280.0" spacing="10.0">
+                        <Label text="🍽 Yemek Kaydı Ekle" style="-fx-font-size: 16px; -fx-font-weight: bold;" AnchorPane.topAnchor="0.0"/>
+
+                        <!-- Dinamik olarak kodda eklenecek ComboBox -->
+                        <ComboBox fx:id="foodComboBox" promptText="Yemek Seçin" prefWidth="200.0"/>
+
+                        <!-- Porsiyon girişi -->
+                        <VBox spacing="5.0" alignment="TOP_LEFT">
+                            <HBox spacing="5.0" alignment="CENTER_LEFT">
+                                <Label text="Porsiyon:"/>
+                                <TextField fx:id="portionField" text="1" prefWidth="60.0"/>
+                            </HBox>
+
+                            <Label fx:id="caloriesLabel" text="Kalori: 0 kcal"/>
+                            <Label fx:id="carbsLabel" text="Karbonhidrat: 0 g"/>
+                            <Label fx:id="proteinLabel" text="Protein: 0 g"/>
+                            <Label fx:id="fatLabel" text="Yağ: 0 g"/>
+                        </VBox>
+
+                        <!-- Ekle butonu -->
+                        <Button text="➕ Ekle"/>
+                    </VBox>
+
+
+                    <!-- Orta Çizgi -->
+                    <Pane prefWidth="2.0" style="-fx-background-color: #cccccc;" />
+
+                    <!-- Sağ: Besin Değerleri Özeti -->
+                    <VBox alignment="TOP_CENTER" prefWidth="280.0" spacing="10.0">
+                        <Label text="📋 Özet" style="-fx-font-size: 16px; -fx-font-weight: bold;" AnchorPane.topAnchor="0.0"/>
+                    </VBox>
+                </HBox>
             </VBox>
+
 
             <VBox fx:id="profilePanel" alignment="CENTER" visible="false">
                 <Label text="👤 Profil"/>

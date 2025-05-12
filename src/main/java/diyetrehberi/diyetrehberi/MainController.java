@@ -7,12 +7,15 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -22,18 +25,38 @@ public class MainController implements Initializable {
 
     @FXML
     private Label nameLabel, userNameLabel, ageLabel, genderLabel, weightLabel, heightLabel;
-
     @FXML
     private TextField weightField, heightField;
 
+    // Yeni: Yemek Paneli Bileşenleri
+    @FXML
+    private ComboBox<String> foodComboBox, exerciseComboBox;
+    @FXML
+    private TextField portionField, durationField;
+    @FXML
+    private Label caloriesLabel, carbsLabel, proteinLabel, fatLabel, caloriesBurnedLabel;
+
+    // Yemek verileri için harita
+    private Map<String, FoodItem> foodMap = new HashMap<>();
+    private Map<String, ExerciseItem> exerciseMap = new HashMap<>();
+
+    private Database db;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        db = Database.getInstance();
         fetchUserDetailsFromDatabase();
-        handleHome(); // Uygulama başladığında Ana Sayfa panelini göster
+        loadFoodsFromDatabase();
+        loadExercisesFromDatabase(); // <-- Eklendi
+        setupFoodComboBoxListener();
+        setupExerciseComboBoxListener(); // <-- Eklendi
+        handleHome();
+
+
     }
 
+
     private void fetchUserDetailsFromDatabase() {
-        Database db = Database.getInstance();
         int userId = db.getCurrentUserId();
         User user = db.getUserDetails(userId);
 
@@ -41,8 +64,8 @@ public class MainController implements Initializable {
             userNameLabel.setText("Hoşgeldin " + user.getName());
             ageLabel.setText("Yaş: " + user.getAge());
             genderLabel.setText("Cinsiyet: " + user.getGender());
-            weightLabel.setText(+ user.getWeight() + " kg");
-            heightLabel.setText(+ user.getHeight() + " cm");
+            weightLabel.setText(user.getWeight() + " kg");
+            heightLabel.setText(user.getHeight() + " cm");
         }
     }
 
@@ -84,31 +107,23 @@ public class MainController implements Initializable {
         settingsPanel.setVisible(true);
     }
 
-    // Boyu düzenleme işlemi
     @FXML
     private void handleEditWeight() {
-        // Only set the numeric part from the label into the TextField
-        weightField.setText(weightLabel.getText().replace(" kg", "")); // Remove " kg"
+        weightField.setText(weightLabel.getText().replace(" kg", ""));
         weightField.setVisible(true);
-        weightLabel.setVisible(false);  // Hide the label when editing
-
-        // Focus on TextField for easy editing
+        weightLabel.setVisible(false);
         weightField.requestFocus();
 
-        // Handle "Enter" key press to update the weight
         weightField.setOnAction(event -> {
             try {
                 double newWeight = Double.parseDouble(weightField.getText());
                 if (newWeight > 0) {
-                    // Update the database (if needed)
                     Database db = Database.getInstance();
                     int userId = db.getCurrentUserId();
                     db.updateUserWeight(userId, newWeight);
-
-                    // Update the label with the new value, only the numeric part and add "kg"
                     weightLabel.setText(newWeight + " kg");
-                    weightLabel.setVisible(true);  // Show the label again
-                    weightField.setVisible(false); // Hide the TextField after editing
+                    weightLabel.setVisible(true);
+                    weightField.setVisible(false);
                 } else {
                     showError("Geçersiz ağırlık değeri.");
                 }
@@ -120,28 +135,21 @@ public class MainController implements Initializable {
 
     @FXML
     private void handleEditHeight() {
-        // Only set the numeric part from the label into the TextField
-        heightField.setText(heightLabel.getText().replace(" cm", "")); // Remove " cm"
+        heightField.setText(heightLabel.getText().replace(" cm", ""));
         heightField.setVisible(true);
-        heightLabel.setVisible(false);  // Hide the label when editing
-
-        // Focus on TextField for easy editing
+        heightLabel.setVisible(false);
         heightField.requestFocus();
 
-        // Handle "Enter" key press to update the height
         heightField.setOnAction(event -> {
             try {
                 double newHeight = Double.parseDouble(heightField.getText());
                 if (newHeight > 0) {
-                    // Update the database (if needed)
                     Database db = Database.getInstance();
                     int userId = db.getCurrentUserId();
                     db.updateUserHeight(userId, newHeight);
-
-                    // Update the label with the new value, only the numeric part and add "cm"
                     heightLabel.setText(newHeight + " cm");
-                    heightLabel.setVisible(true);  // Show the label again
-                    heightField.setVisible(false); // Hide the TextField after editing
+                    heightLabel.setVisible(true);
+                    heightField.setVisible(false);
                 } else {
                     showError("Geçersiz boy değeri.");
                 }
@@ -150,12 +158,12 @@ public class MainController implements Initializable {
             }
         });
     }
+
     @FXML
     private void handleRemoveUser() {
         Database db = Database.getInstance();
         int userId = db.getCurrentUserId();
 
-        // Confirm before removing the user
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Kullanıcı Silme");
         alert.setHeaderText("Kullanıcıyı silmek üzeresiniz");
@@ -163,20 +171,15 @@ public class MainController implements Initializable {
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                // Remove the user from the database
                 db.removeUser(userId);
-
-                // Clear the current user ID
                 db.setCurrentUserId(-1);
 
-                // Show a confirmation message
                 Alert confirmationAlert = new Alert(Alert.AlertType.INFORMATION);
                 confirmationAlert.setTitle("Başarılı");
                 confirmationAlert.setHeaderText("Kullanıcı başarıyla silindi");
                 confirmationAlert.setContentText("Yeni bir kullanıcı seçmelisiniz.");
                 confirmationAlert.showAndWait();
 
-                // Load the selectuser.fxml to allow the user to select a new user
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/selectuser.fxml"));
                     Parent root = loader.load();
@@ -192,9 +195,87 @@ public class MainController implements Initializable {
         });
     }
 
+    private void loadFoodsFromDatabase() {
+        Database db = Database.getInstance();
+        foodMap = db.loadFoodsFromDatabase();
+        foodComboBox.getItems().addAll(foodMap.keySet());
+    }
+
+    private void setupFoodComboBoxListener() {
+        foodComboBox.setOnAction(event -> updateNutritionalValues());
+        portionField.setOnAction(event -> updateNutritionalValues());
+    }
+
+    private void updateNutritionalValues() {
+        String selected = foodComboBox.getValue();
+        if (selected == null || !foodMap.containsKey(selected)) return;
+
+        FoodItem item = foodMap.get(selected);
+
+        double portion = 1.0;
+        try {
+            String portionText = portionField.getText();
+            if (!portionText.isBlank()) {
+                portion = Double.parseDouble(portionText);
+            }
+        } catch (NumberFormatException e) {
+            portion = 1.0;
+        }
+
+        caloriesLabel.setText("Kalori: " + round(item.kalori * portion) + " kcal");
+        carbsLabel.setText("Karbonhidrat: " + round(item.karbonhidrat * portion) + " g");
+        proteinLabel.setText("Protein: " + round(item.protein * portion) + " g");
+        fatLabel.setText("Yağ: " + round(item.yag * portion) + " g");
+    }
+
+    private double round(double val) {
+        return Math.round(val * 100.0) / 100.0;
+    }
 
 
+    private void loadExercisesFromDatabase() {
+        Database db = Database.getInstance();
+        exerciseMap = db.loadExercisesFromDatabase();
+        exerciseComboBox.getItems().addAll(exerciseMap.keySet());
+    }
 
+    private void setupExerciseComboBoxListener() {
+        exerciseComboBox.setOnAction(event -> {
+            String selected = exerciseComboBox.getValue();
+            if (selected != null && exerciseMap.containsKey(selected)) {
+                ExerciseItem item = exerciseMap.get(selected);
+                System.out.println("Seçilen Egzersiz: " + item.getName() +
+                        ", Kategori: " + item.getCategory() +
+                        ", Kalori/dk: " + item.getCaloriesBurnedPerMinute());
+
+                // Dakika girilmişse yakılan kaloriyi hesapla ve göster
+                updateCaloriesBurned();
+            }
+        });
+
+        // Kullanıcı süre girdikçe yakılan kaloriyi güncelle
+        durationField.setOnAction(event -> updateCaloriesBurned());
+        durationField.textProperty().addListener((obs, oldVal, newVal) -> updateCaloriesBurned());
+    }
+    private void updateCaloriesBurned() {
+        String selectedExercise = exerciseComboBox.getValue();
+        if (selectedExercise == null || !exerciseMap.containsKey(selectedExercise)) return;
+
+        ExerciseItem item = exerciseMap.get(selectedExercise);
+        double duration = 0;
+
+        try {
+            String durationText = durationField.getText();
+            if (!durationText.isBlank()) {
+                duration = Double.parseDouble(durationText);
+            }
+        } catch (NumberFormatException e) {
+            duration = 0;
+        }
+
+        double totalCalories = item.getCaloriesBurnedPerMinute() * duration;
+        caloriesBurnedLabel.setText("Yakılan Kalori: " + round(totalCalories) + " kcal");
+    }
     // Hata mesajı göster
     private void showError(String message) {
         Alert alert = new Alert(AlertType.ERROR);
@@ -204,3 +285,7 @@ public class MainController implements Initializable {
         alert.showAndWait();
     }
 }
+
+
+
+

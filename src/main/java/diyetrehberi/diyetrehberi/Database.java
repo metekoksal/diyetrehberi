@@ -1,6 +1,9 @@
 package diyetrehberi.diyetrehberi;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Database {
     private static Database instance;
@@ -126,4 +129,46 @@ public class Database {
             e.printStackTrace();
         }
     }
+    // Yemekleri veritabanından yükle
+    public Map<String, FoodItem> loadFoodsFromDatabase() {
+        Map<String, FoodItem> foodMap = new HashMap<>();
+        String sql = "SELECT * FROM yemekler";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                String name = rs.getString("yemek_adi");
+                FoodItem item = new FoodItem(
+                        name,
+                        rs.getDouble("porsiyon"),
+                        rs.getDouble("kalori"),
+                        rs.getDouble("protein"),
+                        rs.getDouble("karbonhidrat"),
+                        rs.getDouble("yag")
+                );
+                foodMap.put(name, item);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return foodMap;
+    }
+
+    public Map<String, ExerciseItem> loadExercisesFromDatabase() {
+        Map<String, ExerciseItem> exerciseMap = new HashMap<>();
+        String sql = "SELECT name, category, calories_burned_per_min FROM exercises";
+
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                String name = rs.getString("name");
+                String category = rs.getString("category");
+                double caloriesBurnedPerMin = rs.getDouble("calories_burned_per_min");
+                exerciseMap.put(name, new ExerciseItem(name,category , caloriesBurnedPerMin));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return exerciseMap;
+    }
+
 }
