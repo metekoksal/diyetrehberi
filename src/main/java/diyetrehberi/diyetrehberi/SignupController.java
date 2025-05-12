@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 
 public class SignupController {
 
-    // Injecting the VBox (you can remove this if not used directly in the code)
+    // Injecting the VBox
     @FXML
     private VBox vbox;
 
