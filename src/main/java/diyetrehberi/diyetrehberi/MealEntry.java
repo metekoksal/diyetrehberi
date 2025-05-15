@@ -1,57 +1,58 @@
 package diyetrehberi.diyetrehberi;
 
-import java.sql.Time;
+import java.sql.*;
+// verileri id'ye göre db'den çekecek ve obje oluşturacak
 
-public class MealEntry implements Trackable {
-    private int id;
-    private String name;
-    private double calories, proteins, fats, carbs;
+public class MealEntry extends Entry {
+    private double proteins, fats, carbs;
     private int servingSize;
-    private Time timeEaten;
-
-
-    // Time meal was eaten
-    public Time getTime() {
-        return timeEaten;
-    }
 
     // Calories Taken
-    public double calculateCalories() {  // kalori hesabı yapılacak
-        return calories;
+    public double calculateCalories() {
+        return servingSize * getCalories();
     }
 
-    // Constructor
-    public MealEntry(int id, String name, double calories, double proteins, double fats, double carbs) {
-        this.id = id;
-        this.name = name;
-        this.calories = calories;
-        this.proteins = proteins;
-        this.fats = fats;
-        this.carbs = carbs;
+    // ana constructor
+    public MealEntry(int id, int servingSize) {
+        super(id);
+        this.servingSize = servingSize;
+        try {
+            loadMealDataFromDatabase(id, servingSize);
+        } catch(Exception e){
+            System.out.println(e);
+        }
     }
+
+    private void loadMealDataFromDatabase(int id, int servingSize) throws SQLException {
+        Connection connection = Database.getInstance().getConnection();
+
+        String sql = "SELECT name, serving_size, calories, proteins, carbs, fats, category FROM meals WHERE food_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+
+                    this.setName(rs.getString("name"));
+                    this.setCalories(servingSize * rs.getDouble("calories"));
+                    this.proteins = servingSize * rs.getDouble("proteins");
+                    this.carbs = servingSize * rs.getDouble("carbs");
+                    this.fats = servingSize * rs.getDouble("fats");
+                    this.setCategory(rs.getString("category"));
+                } else {
+                    throw new SQLException("Meal with ID " + id + " not found");
+                }
+            }
+        }
+    }
+
 
     // Getters & Setters
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public double getCalories() {
-        return calories;
-    }
-
-    public void setCalories(float calories) {
-        this.calories = calories;
-    }
-
     public double getProteins() {
         return proteins;
     }
 
-    public void setProteins(float proteins) {
+    public void setProteins(double proteins) {
         this.proteins = proteins;
     }
 
@@ -59,7 +60,7 @@ public class MealEntry implements Trackable {
         return fats;
     }
 
-    public void setFats(float fats) {
+    public void setFats(double fats) {
         this.fats = fats;
     }
 
@@ -67,25 +68,10 @@ public class MealEntry implements Trackable {
         return carbs;
     }
 
-    public void setCarbs(float carbs) {
+    public void setCarbs(double carbs) {
         this.carbs = carbs;
     }
 
-    public Time getTimeEaten() {
-        return timeEaten;
-    }
-
-    public void setTimeEaten(Time timeEaten) {
-        this.timeEaten = timeEaten;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public int getServingSize() {
         return servingSize;
