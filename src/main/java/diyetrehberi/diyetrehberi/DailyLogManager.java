@@ -6,7 +6,8 @@ import java.time.LocalTime;
 
 
 //db'ye kaydedilen her şey için log manager
-//logMeal tamamlanmadı, veritabanından veri çekmesi sağlanacak - main methodunda örnek entry bulunmakta
+
+//kategori için sql insert eklenecek
 //logExercise yazılacak
 
 public class DailyLogManager {
@@ -50,9 +51,7 @@ public class DailyLogManager {
 
     public void logMeal(int dailyLogId, MealEntry meal, Time eatenTime) throws SQLException {
         Connection connection = Database.getInstance().getConnection();
-        String sql = "INSERT INTO meal_entry " +
-                "(daily_log_id, meal_id, name, calories, protein, carbs, fat, time_eaten) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO meal_entry (daily_log_id, meal_id, name, calories, proteins, carbs, fats, time_eaten, serving_size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, dailyLogId);
@@ -63,34 +62,40 @@ public class DailyLogManager {
             pstmt.setDouble(6, meal.getCarbs());
             pstmt.setDouble(7, meal.getFats());
             pstmt.setTime(8, eatenTime);
+            pstmt.setInt(9, meal.getServingSize());
 
             pstmt.executeUpdate();
         }
     }
 
+    // TEST MAIN'İ
+    // ilk user id belirlenir, daily log oluşturulur, örneğin 4 id'li yemekten 2 porsiyon yemek saat 10:30 için db'e eklenir
     public static void main(String[] args) {
         try {
             DailyLogManager logManager = new DailyLogManager();
-            int userId = 1;
-            LocalDate today = LocalDate.now();
+            int userId = 2;
 
-            // Create daily log
+            //for daily log time (today)
+            LocalDate today = LocalDate.now();
+            // creates daily log
             int dailyLogId = logManager.createDailyLog(userId, today);
 
-            // Log a meal
-            MealEntry meal = new MealEntry(
-                    1, "Sa", 5, 6, 7, 8
-            );
+            MealEntry meal = new MealEntry(4, 1);
 
-            // Create Time object using milliseconds since midnight
-            LocalTime localTime = LocalTime.of(7, 30);
+            int hour = 9, minute = 30;
+            long msSinceMidnight = (hour*60+minute)*60*1000;
 
+            // sql.Time unix time'dan beri geçen ms gösteriyor (Time türünde), saat için değer doğrudan alınabilir
+            Time sqlTime = new Time(msSinceMidnight);
 
+            // log meal at a specific time on daily log dailyLogId
+            logManager.logMeal(dailyLogId, meal, sqlTime);
 
-            // Log meal at a specific time
-            logManager.logMeal(dailyLogId, meal, Time.valueOf(localTime));
-        } catch (SQLException e) {
-            e.printStackTrace();
+            //debug print
+            System.out.println(logManager.getDailyLogId(userId, today) + "id'li günlük log'a kayıt eklendi. ID:" + meal.getId());
+
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
 }
