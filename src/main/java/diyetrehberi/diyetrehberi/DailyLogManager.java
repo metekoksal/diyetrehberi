@@ -2,13 +2,9 @@ package diyetrehberi.diyetrehberi;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 
 //db'ye kaydedilen her şey için log manager
-
-//kategori için sql insert eklenecek
-//logExercise yazılacak
 
 public class DailyLogManager {
 
@@ -51,7 +47,7 @@ public class DailyLogManager {
 
     public void logMeal(int dailyLogId, MealEntry meal, Time eatenTime) throws SQLException {
         Connection connection = Database.getInstance().getConnection();
-        String sql = "INSERT INTO meal_entry (daily_log_id, meal_id, name, calories, proteins, carbs, fats, time_eaten, serving_size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO meal_entry (daily_log_id, meal_id, name, calories, proteins, carbs, fats, time_eaten, servings, category) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, dailyLogId);
@@ -62,7 +58,25 @@ public class DailyLogManager {
             pstmt.setDouble(6, meal.getCarbs());
             pstmt.setDouble(7, meal.getFats());
             pstmt.setTime(8, eatenTime);
-            pstmt.setInt(9, meal.getServingSize());
+            pstmt.setInt(9, meal.getServings());
+            pstmt.setString(10, meal.getCategory());
+
+            pstmt.executeUpdate();
+        }
+    }
+
+    public void logExercise(int dailyLogId, ExerciseEntry exercise, Time timeDone) throws SQLException {
+        Connection connection = Database.getInstance().getConnection();
+        String sql = "INSERT INTO exercise_entry (daily_log_id, exercise_id, name, calories_burned, time_done, duration, category) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, dailyLogId);
+            pstmt.setInt(2, exercise.getId());  // foreign key to exercise table
+            pstmt.setString(3, exercise.getName());
+            pstmt.setDouble(4, exercise.getCalories()); // calories burned
+            pstmt.setTime(5, timeDone);
+            pstmt.setInt(6, exercise.getDuration());
+            pstmt.setString(7, exercise.getCategory());
 
             pstmt.executeUpdate();
         }
@@ -73,26 +87,33 @@ public class DailyLogManager {
     public static void main(String[] args) {
         try {
             DailyLogManager logManager = new DailyLogManager();
-            int userId = 2;
+            int userId = 1;
 
             //for daily log time (today)
             LocalDate today = LocalDate.now();
             // creates daily log
             int dailyLogId = logManager.createDailyLog(userId, today);
 
-            MealEntry meal = new MealEntry(4, 1);
+            // create new meal entry
+            //MealEntry meal = new MealEntry(10, 1);
 
+            // create new exercise entry
+            ExerciseEntry exercise = new ExerciseEntry(3, 30);
+
+            // örnek saat init
             int hour = 9, minute = 30;
             long msSinceMidnight = (hour*60+minute)*60*1000;
-
             // sql.Time unix time'dan beri geçen ms gösteriyor (Time türünde), saat için değer doğrudan alınabilir
             Time sqlTime = new Time(msSinceMidnight);
 
             // log meal at a specific time on daily log dailyLogId
-            logManager.logMeal(dailyLogId, meal, sqlTime);
+            //logManager.logMeal(dailyLogId, meal, sqlTime);
+
+            // log exercise at a specific time on daily log dailyLogID
+            logManager.logExercise(3, exercise, sqlTime);
 
             //debug print
-            System.out.println(logManager.getDailyLogId(userId, today) + "id'li günlük log'a kayıt eklendi. ID:" + meal.getId());
+            System.out.println(logManager.getDailyLogId(userId, today) + "id'li günlük log'a kayıt eklendi. ID:" + exercise.getId());
 
         } catch (Exception e) {
             System.out.println(e);
