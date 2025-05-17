@@ -5,28 +5,28 @@ import java.sql.*;
 
 public class MealEntry extends Entry {
     private double proteins, fats, carbs;
-    private int servingSize;
+    private int servings;
 
     // Calories Taken
     public double calculateCalories() {
-        return servingSize * getCalories();
+        return servings * getCalories();
     }
 
     // ana constructor
-    public MealEntry(int id, int servingSize) {
+    public MealEntry(int id, int servings) {
         super(id);
-        this.servingSize = servingSize;
+        this.servings = servings;
         try {
-            loadMealDataFromDatabase(id, servingSize);
+            loadMealDataFromDatabase(id, servings);
         } catch(Exception e){
             System.out.println(e);
         }
     }
 
-    private void loadMealDataFromDatabase(int id, int servingSize) throws SQLException {
+    private void loadMealDataFromDatabase(int id, int servings) throws SQLException {
         Connection connection = Database.getInstance().getConnection();
 
-        String sql = "SELECT name, serving_size, calories, proteins, carbs, fats, category FROM meals WHERE food_id = ?";
+        String sql = "SELECT name, calories, proteins, carbs, fats, category FROM meals WHERE food_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
 
@@ -34,10 +34,10 @@ public class MealEntry extends Entry {
                 if (rs.next()) {
 
                     this.setName(rs.getString("name"));
-                    this.setCalories(servingSize * rs.getDouble("calories"));
-                    this.proteins = servingSize * rs.getDouble("proteins");
-                    this.carbs = servingSize * rs.getDouble("carbs");
-                    this.fats = servingSize * rs.getDouble("fats");
+                    this.setCalories(servings * rs.getDouble("calories"));
+                    this.proteins = servings * rs.getDouble("proteins");
+                    this.carbs = servings * rs.getDouble("carbs");
+                    this.fats = servings * rs.getDouble("fats");
                     this.setCategory(rs.getString("category"));
                 } else {
                     throw new SQLException("Meal with ID " + id + " not found");
@@ -73,11 +73,11 @@ public class MealEntry extends Entry {
     }
 
 
-    public int getServingSize() {
-        return servingSize;
+    public int getServings() {
+        return servings;
     }
 
-    public void setServingSize(int servingSize) {
-        this.servingSize = servingSize;
+    public void setServings(int servings) {
+        this.servings = servings;
     }
 }
