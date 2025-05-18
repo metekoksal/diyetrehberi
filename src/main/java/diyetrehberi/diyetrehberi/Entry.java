@@ -1,7 +1,11 @@
 package diyetrehberi.diyetrehberi;
 
 public abstract class Entry implements Trackable{
-    public abstract double calculateCalories();
+
+    // overriden in Exercise & Meal Entry
+    public double calculateCalories(){
+        return calories;
+    }
     private int id; //item id
     private int userID;
     private String name;
