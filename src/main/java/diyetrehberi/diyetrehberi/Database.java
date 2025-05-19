@@ -18,7 +18,7 @@ public class Database {
             connection = DriverManager.getConnection(DB_URL);
             System.out.println("Veritabanına bağlanıldı.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
     }
 
@@ -52,7 +52,7 @@ public class Database {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
     }
 
@@ -68,7 +68,7 @@ public class Database {
                 System.out.println("Belirtilen ID ile kullanıcı bulunamadı: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
     }
 
@@ -90,7 +90,7 @@ public class Database {
                 return null;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e);
             return null;
         }
     }
@@ -111,7 +111,7 @@ public class Database {
             pstmt.executeUpdate();
             System.out.println("Boy güncellendi: " + newHeight);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
     }
 
@@ -123,36 +123,39 @@ public class Database {
             pstmt.executeUpdate();
             System.out.println("Ağırlık güncellendi: " + newWeight);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
     }
     // Yemekleri veritabanından yükle
     public Map<String, FoodItem> loadFoodsFromDatabase() {
         Map<String, FoodItem> foodMap = new HashMap<>();
-        String sql = "SELECT * FROM yemekler";
+
+        String sql = "SELECT * FROM meals";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                String name = rs.getString("yemek_adi");
+                String name = rs.getString("name");
                 FoodItem item = new FoodItem(
                         name,
-                        rs.getDouble("porsiyon"),
-                        rs.getDouble("kalori"),
-                        rs.getDouble("protein"),
-                        rs.getDouble("karbonhidrat"),
-                        rs.getDouble("yag")
+                        rs.getDouble("serving_size_grams"),
+                        rs.getDouble("calories"),
+                        rs.getDouble("proteins"),
+                        rs.getDouble("carbs"),
+                        rs.getDouble("fats"),
+                        rs.getString("category"),
+                        rs.getInt("food_id")
                 );
                 foodMap.put(name, item);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
         return foodMap;
     }
 
     public Map<String, ExerciseItem> loadExercisesFromDatabase() {
         Map<String, ExerciseItem> exerciseMap = new HashMap<>();
-        String sql = "SELECT name, category, calories_burned_per_min FROM exercises";
+        String sql = "SELECT name, category, calories_burned_per_min, exercise_id FROM exercises";
 
         try (Statement stmt = connection.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
@@ -160,10 +163,11 @@ public class Database {
                 String name = rs.getString("name");
                 String category = rs.getString("category");
                 double caloriesBurnedPerMin = rs.getDouble("calories_burned_per_min");
-                exerciseMap.put(name, new ExerciseItem(name,category , caloriesBurnedPerMin));
+                int exerciseId = rs.getInt("exercise_id");
+                exerciseMap.put(name, new ExerciseItem(name, category, caloriesBurnedPerMin, exerciseId));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
         return exerciseMap;
     }
