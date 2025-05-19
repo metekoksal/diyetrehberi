@@ -15,7 +15,7 @@ public class MainApplication extends Application {
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/SelectUser.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
-        stage.setTitle("Diyet Rehberi");
+        stage.setTitle("DiyetRehberi – Diyet ve Egzersiz Takip Sistemi");
 
         // İkonu ayarlamak
         stage.getIcons().add(new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResource("/Assets/icon.png")).toExternalForm()));
