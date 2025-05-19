@@ -82,8 +82,8 @@ public class DailyLogManager {
         }
     }
 
-    // TEST MAIN'İ
-    // ilk user id belirlenir, daily log oluşturulur, örneğin 4 id'li yemekten 2 porsiyon yemek saat 10:30 için db'e eklenir
+    // TEST METODU
+/*
     public static void main(String[] args) {
         try {
             DailyLogManager logManager = new DailyLogManager();
@@ -119,4 +119,6 @@ public class DailyLogManager {
             System.out.println(e);
         }
     }
+
+ */
 }
