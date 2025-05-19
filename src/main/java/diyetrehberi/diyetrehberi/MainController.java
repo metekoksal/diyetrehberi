@@ -1,5 +1,6 @@
 package diyetrehberi.diyetrehberi;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -12,11 +13,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.ResultSet;
+import java.sql.Time;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainController implements Initializable {
 
@@ -28,9 +27,10 @@ public class MainController implements Initializable {
     @FXML
     private TextField weightField, heightField;
 
-    // Yeni: Yemek Paneli Bileşenleri
     @FXML
     private ComboBox<String> foodComboBox, exerciseComboBox;
+    @FXML
+    private ComboBox<String> hourComboBoxMeal, minuteComboBoxMeal, hourComboBoxExercise, minuteComboBoxExercise;
     @FXML
     private TextField portionField, durationField;
     @FXML
@@ -50,6 +50,7 @@ public class MainController implements Initializable {
         loadExercisesFromDatabase(); // <-- Eklendi
         setupFoodComboBoxListener();
         setupExerciseComboBoxListener(); // <-- Eklendi
+        populateTimeComboBoxes();
         handleHome();
 
 
@@ -195,6 +196,93 @@ public class MainController implements Initializable {
         });
     }
 
+    @FXML
+    private void handleLogExercise() {
+        ExerciseItem item = exerciseMap.get(exerciseComboBox.getValue());
+
+        int duration = 1;
+        try{
+            String durationText = durationField.getText();
+            if(!durationText.isBlank()){
+                duration = Math.abs(Integer.parseInt(durationText));
+            }
+        } catch(NumberFormatException e){
+            duration = 0;
+        }
+
+        try{
+            ExerciseEntry exerciseentry = new ExerciseEntry(item.getExerciseId(), duration);
+
+            int hourDone = Integer.parseInt(hourComboBoxExercise.getValue());
+            int minuteDone = Integer.parseInt(minuteComboBoxExercise.getValue());
+
+            DailyLogManager logManager = new DailyLogManager();
+            int userId = db.getCurrentUserId();
+            LocalDate today = LocalDate.now();
+            int dailyLogId = logManager.createDailyLog(userId, today);
+            long msSinceMidnight = (hourDone*60 +minuteDone)*60*1000;
+            Time sqlTime = new Time(msSinceMidnight);
+            // log exercise
+            logManager.logExercise(dailyLogId, exerciseentry, sqlTime);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+
+    }
+
+    @FXML
+    private void handleLogMeal() {
+        FoodItem item = foodMap.get(foodComboBox.getValue());
+
+        //get portion text field value as int (number format exception - default to 1)
+        int portion = 1;
+        try {
+            String portionText = portionField.getText();
+            if (!portionText.isBlank()) {
+                portion = Math.abs(Integer.parseInt(portionText));
+            }
+        } catch (NumberFormatException e) {
+            portion = 0;
+        }
+
+        try{
+            MealEntry mealentry = new MealEntry(item.getFoodid(), portion);
+
+            // set hour & minute from selected vaules in combo boxes
+            int hourEaten = Integer.parseInt(hourComboBoxMeal.getValue());
+            int minuteEaten = Integer.parseInt(minuteComboBoxMeal.getValue());
+
+            DailyLogManager logManager = new DailyLogManager();
+            int userId = db.getCurrentUserId();
+            LocalDate today = LocalDate.now();
+            int dailyLogId = logManager.createDailyLog(userId, today);
+            long msSinceMidnight = (hourEaten*60 +minuteEaten)*60*1000;
+            Time sqlTime = new Time(msSinceMidnight);
+            //log meal
+            logManager.logMeal(dailyLogId, mealentry, sqlTime);
+        } catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+    // yemeğin kaçta yenildiğini ve egzersizin kaçta yapıldığını gösteren combo boxları doldurur
+    // saatler ve dk'lar 00, 01... 24 diye gider (string, db'e kaydedilirken int'e çevrilir)
+    private void populateTimeComboBoxes(){
+        List<String> hours = new ArrayList<>();
+        for (int i = 0; i < 24; i++) {
+            hours.add(String.format("%02d", i));
+        }
+        hourComboBoxMeal.setItems(FXCollections.observableArrayList(hours));
+        hourComboBoxExercise.setItems(FXCollections.observableArrayList(hours));
+        List<String> minutes = new ArrayList<>();
+        for (int i = 0; i < 60; i++) {
+            minutes.add(String.format("%02d", i));
+        }
+        minuteComboBoxExercise.setItems(FXCollections.observableArrayList(minutes));
+        minuteComboBoxMeal.setItems(FXCollections.observableArrayList(minutes));
+    }
+
     private void loadFoodsFromDatabase() {
         Database db = Database.getInstance();
         foodMap = db.loadFoodsFromDatabase();
@@ -216,22 +304,22 @@ public class MainController implements Initializable {
         try {
             String portionText = portionField.getText();
             if (!portionText.isBlank()) {
-                portion = Double.parseDouble(portionText);
+                // porsiyon miktarı mutlak olarak alınır (negatif girilemez)
+                portion = Math.abs(Double.parseDouble(portionText));
             }
         } catch (NumberFormatException e) {
             portion = 1.0;
         }
 
-        caloriesLabel.setText("Kalori: " + round(item.kalori * portion) + " kcal");
-        carbsLabel.setText("Karbonhidrat: " + round(item.karbonhidrat * portion) + " g");
-        proteinLabel.setText("Protein: " + round(item.protein * portion) + " g");
-        fatLabel.setText("Yağ: " + round(item.yag * portion) + " g");
+        caloriesLabel.setText("Kalori: " + round(item.getKalori() * portion) + " kcal");
+        carbsLabel.setText("Karbonhidrat: " + round(item.getKarbonhidrat() * portion) + " g");
+        proteinLabel.setText("Protein: " + round(item.getProtein() * portion) + " g");
+        fatLabel.setText("Yağ: " + round(item.getYag() * portion) + " g");
     }
 
     private double round(double val) {
         return Math.round(val * 100.0) / 100.0;
     }
-
 
     private void loadExercisesFromDatabase() {
         Database db = Database.getInstance();
@@ -257,6 +345,7 @@ public class MainController implements Initializable {
         durationField.setOnAction(event -> updateCaloriesBurned());
         durationField.textProperty().addListener((obs, oldVal, newVal) -> updateCaloriesBurned());
     }
+
     private void updateCaloriesBurned() {
         String selectedExercise = exerciseComboBox.getValue();
         if (selectedExercise == null || !exerciseMap.containsKey(selectedExercise)) return;
@@ -267,7 +356,8 @@ public class MainController implements Initializable {
         try {
             String durationText = durationField.getText();
             if (!durationText.isBlank()) {
-                duration = Double.parseDouble(durationText);
+                // sürenin mutlak değeri alınır (süre negatif olamaz)
+                duration = Math.abs(Double.parseDouble(durationText));
             }
         } catch (NumberFormatException e) {
             duration = 0;
