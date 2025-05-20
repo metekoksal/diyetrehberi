@@ -1,20 +1,28 @@
 package diyetrehberi.diyetrehberi;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
+import javafx.util.Duration;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class MainController implements Initializable {
@@ -23,18 +31,30 @@ public class MainController implements Initializable {
     private VBox homePanel, exercisePanel, foodPanel, profilePanel, settingsPanel;
 
     @FXML
-    private Label nameLabel, userNameLabel, ageLabel, genderLabel, weightLabel, heightLabel;
-    @FXML
-    private TextField weightField, heightField;
+    private Label nameLabel, userNameLabel, ageLabel, genderLabel, weightLabel, heightLabel,
+            caloriesLabel, carbsLabel, proteinLabel, fatLabel, caloriesBurnedLabel, yAxisLabel;
 
     @FXML
-    private ComboBox<String> foodComboBox, exerciseComboBox;
+    private TextField weightField, heightField, portionField, durationField;
+
     @FXML
-    private ComboBox<String> hourComboBoxMeal, minuteComboBoxMeal, hourComboBoxExercise, minuteComboBoxExercise;
+    private ComboBox<String> foodComboBox, exerciseComboBox,
+            hourComboBoxMeal, minuteComboBoxMeal, hourComboBoxExercise, minuteComboBoxExercise,
+            calorieTypeComboBox, dateRangeComboBox;
+
     @FXML
-    private TextField portionField, durationField;
+    private VBox exerciseSummaryBox, mealSummaryBox;
+
     @FXML
-    private Label caloriesLabel, carbsLabel, proteinLabel, fatLabel, caloriesBurnedLabel;
+    private LineChart<String, Number> calorieChart;
+
+    @FXML
+    private NumberAxis yAxis;
+
+    @FXML
+    private CategoryAxis xAxis;
+
+
 
     // Yemek verileri için harita
     private Map<String, FoodItem> foodMap = new HashMap<>();
@@ -51,11 +71,24 @@ public class MainController implements Initializable {
         setupFoodComboBoxListener();
         setupExerciseComboBoxListener(); // <-- Eklendi
         populateTimeComboBoxes();
+        updateExerciseSummaryBox();
+        updateMealSummaryBox();
+
+        calorieTypeComboBox.getItems().addAll("Alınan Kalori", "Yakılan Kalori", "Egzersiz Süresi");
+        calorieTypeComboBox.setValue("Alınan Kalori");
+
+        dateRangeComboBox.getItems().addAll("Son 1 Hafta", "Son 1 Ay", "Son 3 Ay", "Bu Yıl", "Tüm Zamanlar");
+        dateRangeComboBox.setValue("Son 1 Hafta");
+
+        // Event listener'lar
+        calorieTypeComboBox.setOnAction(e -> updateChart());
+        dateRangeComboBox.setOnAction(e -> updateChart());
+
+        // Başlangıçta çiz
+        updateChart();
+        //home için chartın oluşturulması gerekiyor ondan aşağıya aldım
         handleHome();
-
-
     }
-
 
     private void fetchUserDetailsFromDatabase() {
         int userId = db.getCurrentUserId();
@@ -82,6 +115,7 @@ public class MainController implements Initializable {
     private void handleHome() {
         hideAllPanels();
         homePanel.setVisible(true);
+        updateChart();
     }
 
     @FXML
@@ -224,6 +258,7 @@ public class MainController implements Initializable {
             Time sqlTime = new Time(msSinceMidnight);
             // log exercise
             logManager.logExercise(dailyLogId, exerciseentry, sqlTime);
+            updateExerciseSummaryBox();
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -261,6 +296,7 @@ public class MainController implements Initializable {
             Time sqlTime = new Time(msSinceMidnight);
             //log meal
             logManager.logMeal(dailyLogId, mealentry, sqlTime);
+            updateMealSummaryBox();
         } catch (Exception e){
             System.out.println(e);
         }
@@ -347,25 +383,206 @@ public class MainController implements Initializable {
     }
 
     private void updateCaloriesBurned() {
-        String selectedExercise = exerciseComboBox.getValue();
-        if (selectedExercise == null || !exerciseMap.containsKey(selectedExercise)) return;
+        String selected = exerciseComboBox.getValue();
+        if (selected == null || !exerciseMap.containsKey(selected)) return;
 
-        ExerciseItem item = exerciseMap.get(selectedExercise);
-        double duration = 0;
-
+        ExerciseItem item = exerciseMap.get(selected);
+        int duration = 1;
         try {
             String durationText = durationField.getText();
             if (!durationText.isBlank()) {
-                // sürenin mutlak değeri alınır (süre negatif olamaz)
-                duration = Math.abs(Double.parseDouble(durationText));
+                duration = Math.abs(Integer.parseInt(durationText));
             }
         } catch (NumberFormatException e) {
             duration = 0;
         }
 
-        double totalCalories = item.getCaloriesBurnedPerMinute() * duration;
-        caloriesBurnedLabel.setText("Yakılan Kalori: " + round(totalCalories) + " kcal");
+        double calories = item.getCaloriesBurnedPerMinute() * duration;
+        caloriesBurnedLabel.setText("Yakılan Kalori: " + round(calories) + " kcal");
     }
+
+    public void updateExerciseSummaryBox() {
+        List<ExerciseEntry> exerciseList = db.loadTodaysExerciseEntriesForUser(db.getCurrentUserId());
+        exerciseSummaryBox.getChildren().clear();
+
+        if (exerciseList.isEmpty()) {
+            Label noDataLabel = new Label("Henüz egzersiz kaydı yok.");
+            exerciseSummaryBox.getChildren().add(noDataLabel);
+            return;
+        }
+
+        int totalDuration = 0;
+        int totalCalories = 0;
+
+        for (ExerciseEntry entry : exerciseList) {
+            totalDuration += entry.getDuration();
+            totalCalories += entry.getCalories();
+
+            Label exerciseLabel = new Label(
+                    entry.getName() + " - Süre: " + entry.getDuration() + " dk, Kalori: " + entry.getCalories() + " kcal"
+            );
+
+            Button deleteButton = new Button("X");
+            deleteButton.setOnAction(e -> {
+                boolean success = db.deleteExerciseEntry(entry.getId());
+                if (success) {
+                    updateExerciseSummaryBox();  // Güncelle
+                } else {
+                    System.out.println("Silme işlemi başarısız.");
+                }
+            });
+
+            HBox row = new HBox(10, exerciseLabel, deleteButton);
+            exerciseSummaryBox.getChildren().add(row);
+        }
+
+        Label totalLabel = new Label("Toplam Süre: " + totalDuration + " dk, Toplam Kalori: " + totalCalories + " kcal");
+        totalLabel.setStyle("-fx-font-weight: bold; -fx-padding: 10 0 10 0;");
+        exerciseSummaryBox.getChildren().add(0, totalLabel);
+    }
+
+    public void updateMealSummaryBox() {
+        List<MealEntry> mealList = db.loadTodaysMealEntriesForUser(db.getCurrentUserId());
+        mealSummaryBox.getChildren().clear();
+
+        if (mealList.isEmpty()) {
+            Label noDataLabel = new Label("Henüz yemek kaydı yok.");
+            mealSummaryBox.getChildren().add(noDataLabel);
+            return;
+        }
+
+        double totalCalories = 0;
+        double totalCarbs = 0;
+        double totalProtein = 0;
+        double totalFat = 0;
+
+        for (MealEntry entry : mealList) {
+            totalCalories += entry.getCalories();
+            totalCarbs += entry.getCarbs();
+            totalProtein += entry.getProteins();
+            totalFat += entry.getFats();
+
+            Label mealLabel = new Label(
+                    entry.getName() +
+                            " - Kalori: " + entry.getCalories() +
+                            " kcal, KH: " + entry.getCarbs() +
+                            " g, Protein: " + entry.getProteins() +
+                            " g, Yağ: " + entry.getFats() + " g"
+            );
+
+            Button deleteButton = new Button("X");
+            deleteButton.setOnAction(e -> {
+                boolean success = db.deleteMealEntry(entry.getId());
+                if (success) {
+                    updateMealSummaryBox();  // Güncelle
+                } else {
+                    System.out.println("Silme işlemi başarısız.");
+                }
+            });
+
+            HBox row = new HBox(10, mealLabel, deleteButton);
+            mealSummaryBox.getChildren().add(row);
+        }
+
+        Label totalLabel = new Label(
+                "Toplam Kalori: " + totalCalories + " kcal, " +
+                        "KH: " + totalCarbs + " g, Protein: " + totalProtein + " g, Yağ: " + totalFat + " g"
+        );
+        totalLabel.setStyle("-fx-font-weight: bold; -fx-padding: 10 0 10 0;");
+        mealSummaryBox.getChildren().add(0, totalLabel);
+    }
+
+    private void updateChart() {
+        String selectedType = calorieTypeComboBox.getValue();
+        String selectedRange = dateRangeComboBox.getValue();
+
+        LocalDate[] range = getDateRange(selectedRange);
+        LocalDate start = range[0];
+        LocalDate end = range[1];
+
+        yAxisLabel.setText(selectedType);
+        loadChartByType(db.getCurrentUserId(), start, end, selectedType);
+    }
+
+    private LocalDate[] getDateRange(String rangeLabel) {
+        LocalDate today = LocalDate.now();
+        switch (rangeLabel) {
+            case "Son 1 Hafta":
+                return new LocalDate[]{ today.minusDays(6), today };
+            case "Son 1 Ay":
+                return new LocalDate[]{ today.minusMonths(1).plusDays(1), today };
+            case "Son 3 Ay":
+                return new LocalDate[]{ today.minusMonths(3).plusDays(1), today };
+            case "Bu Yıl":
+                return new LocalDate[]{ LocalDate.of(today.getYear(), 1, 1), today };
+            case "Tüm Zamanlar":
+                return new LocalDate[]{ db.getFirstEntryDate(db.getCurrentUserId()), today };
+            default:
+                return new LocalDate[]{ today.minusDays(6), today };
+        }
+    }
+
+    public void loadChartByType(int userId, LocalDate start, LocalDate end, String type) {
+        Map<LocalDate, Integer> data;
+        String seriesName = "";
+
+        switch (type) {
+            case "Alınan Kalori":
+                data = db.getCaloriesConsumedByDate(userId, start, end);
+                yAxis.setLabel("Alınan Kalori (kcal)");
+                seriesName = "Alınan Kalori";
+                break;
+            case "Yakılan Kalori":
+                data = db.getCaloriesBurnedByDate(userId, start, end);
+                yAxis.setLabel("Yakılan Kalori (kcal)");
+                seriesName = "Yakılan Kalori";
+                break;
+            case "Egzersiz Süresi":
+                data = db.getExerciseDurationByDate(userId, start, end);
+                yAxis.setLabel("Egzersiz Süresi (dk)");
+                seriesName = "Egzersiz Süresi";
+                break;
+            default:
+                System.out.println("Geçersiz veri türü: " + type);
+                return;
+        }
+
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName(seriesName);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");
+        LocalDate current = start;
+        while (!current.isAfter(end)) {
+            int value = data.getOrDefault(current, 0);
+            String label = current.format(formatter);
+            XYChart.Data<String, Number> dataPoint = new XYChart.Data<>(label, value);
+            series.getData().add(dataPoint);
+            current = current.plusDays(1);
+        }
+
+        calorieChart.getData().clear();
+        calorieChart.getData().add(series);
+
+        // Tooltip ve grafik sonrası düzenlemeleri Platform.runLater ile yapıyor
+        Platform.runLater(() -> {
+            for (XYChart.Data<String, Number> d : series.getData()) {
+                Tooltip tooltip = new Tooltip(d.getXValue() + ": " + d.getYValue());
+                tooltip.setShowDelay(Duration.millis(100));
+                Tooltip.install(d.getNode(), tooltip);
+            }
+
+            // X eksenini ve diğer grafik parametrelerini sıfırlayıp düzenliyor
+            xAxis.setCategories(FXCollections.observableArrayList());
+            List<String> categories = new ArrayList<>();
+            LocalDate temp = start;
+            while (!temp.isAfter(end)) {
+                categories.add(temp.format(formatter));
+                temp = temp.plusDays(1);
+            }
+            xAxis.setCategories(FXCollections.observableArrayList(categories));
+        });
+    }
+
     // Hata mesajı göster
     private void showError(String message) {
         Alert alert = new Alert(AlertType.ERROR);

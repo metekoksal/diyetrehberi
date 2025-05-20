@@ -1,16 +1,11 @@
 package diyetrehberi.diyetrehberi;
 
 import java.sql.*;
-// verileri id'ye göre db'den çekecek ve obje oluşturacak
 
 public class MealEntry extends Entry {
     private double proteins, fats, carbs;
     private int servings;
-
-    // Calories Taken
-    public double calculateCalories() {
-        return servings * getCalories();
-    }
+    private String timeEaten;
 
     // ana constructor
     public MealEntry(int id, int servings) {
@@ -21,6 +16,20 @@ public class MealEntry extends Entry {
         } catch(Exception e){
             System.out.println(e);
         }
+    }
+
+    public MealEntry(int id, String name, double calories, double proteins, double carbs, double fats,
+                     int servings, String category, String timeEaten) {
+        super(id);
+        setName(name);
+        setCalories(calories);
+        setCategory(category);
+
+        this.proteins = proteins;
+        this.carbs = carbs;
+        this.fats = fats;
+        this.servings = servings;
+        this.timeEaten = timeEaten;
     }
 
     private void loadMealDataFromDatabase(int id, int servings) throws SQLException {
@@ -46,6 +55,9 @@ public class MealEntry extends Entry {
         }
     }
 
+    public double calculateCalories() {
+        return getCalories(); // zaten toplam kalori veritabanında saklanıyor
+    }
 
     // Getters & Setters
     public double getProteins() {
@@ -72,12 +84,19 @@ public class MealEntry extends Entry {
         this.carbs = carbs;
     }
 
-
     public int getServings() {
         return servings;
     }
 
     public void setServings(int servings) {
         this.servings = servings;
+    }
+
+    public String getTimeEaten() {
+        return timeEaten;
+    }
+
+    public void setTimeEaten(String timeEaten) {
+        this.timeEaten = timeEaten;
     }
 }
