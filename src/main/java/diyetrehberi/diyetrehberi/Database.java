@@ -39,20 +39,20 @@ public class Database {
     }
 
     // Method to create a user in the database
-    public void createUser(String name, int age, String gender, double height, double weight) {
-        String sql = "INSERT INTO users (name, age, gender, height, weight) VALUES (?, ?, ?, ?, ?)";
+    public void createUser(String name, int age, String gender, String email, double height, double weight) {
+        String sql = "INSERT INTO users (name, age, gender, email, height, weight) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, name);
             pstmt.setInt(2, age);
             pstmt.setString(3, gender);
-            pstmt.setDouble(4, height);
-            pstmt.setDouble(5, weight);
+            pstmt.setString(4, email);
+            pstmt.setDouble(5, height);
+            pstmt.setDouble(6, weight);
             pstmt.executeUpdate();
 
-            // Retrieve the generated user ID after inserting
             ResultSet rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
-                currentUserId = rs.getInt(1);  // Save the current user ID
+                currentUserId = rs.getInt(1);
                 System.out.println("Kullanıcı eklendi: " + name + " ID: " + currentUserId);
             }
 
@@ -60,6 +60,7 @@ public class Database {
             System.out.println(e);
         }
     }
+
 
     // Method to remove a user from the database
     public void removeUser(int id) {

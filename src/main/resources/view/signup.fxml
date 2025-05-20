@@ -27,6 +27,7 @@
                     </items>
                 </ChoiceBox>
             </HBox>
+            <TextField fx:id="emailField" promptText="E-posta adresinizi girin" />
             <TextField fx:id="heightField" promptText="Boy (cm)" />
             <TextField fx:id="weightField" promptText="Kilo (kg)" />
             <Button text="Kaydol" onAction="#onSignupClicked" />
