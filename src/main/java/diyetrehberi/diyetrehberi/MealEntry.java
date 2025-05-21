@@ -6,6 +6,7 @@ public class MealEntry extends Entry {
     private double proteins, fats, carbs;
     private int servings;
     private String timeEaten;
+    private int mealId;
 
     // ana constructor
     public MealEntry(int id, int servings) {
@@ -19,7 +20,7 @@ public class MealEntry extends Entry {
     }
 
     public MealEntry(int id, String name, double calories, double proteins, double carbs, double fats,
-                     int servings, String category, String timeEaten) {
+                     int servings, String category, String timeEaten, int mealId) {
         super(id);
         setName(name);
         setCalories(calories);
@@ -30,7 +31,9 @@ public class MealEntry extends Entry {
         this.fats = fats;
         this.servings = servings;
         this.timeEaten = timeEaten;
+        this.mealId = mealId;
     }
+
 
     private void loadMealDataFromDatabase(int id, int servings) throws SQLException {
         Connection connection = Database.getInstance().getConnection();
@@ -95,6 +98,10 @@ public class MealEntry extends Entry {
     public String getTimeEaten() {
         return timeEaten;
     }
+
+    public int getMealId() { return mealId; }
+
+    public void setMealId(int mealId) { this.mealId = mealId; }
 
     public void setTimeEaten(String timeEaten) {
         this.timeEaten = timeEaten;

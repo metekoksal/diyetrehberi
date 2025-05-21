@@ -217,7 +217,8 @@ public class Database {
 
     public List<MealEntry> loadTodaysMealEntriesForUser(int userId) {
         List<MealEntry> mealList = new ArrayList<>();
-        String sql = "SELECT m.id, m.daily_log_id, m.name, m.calories, m.proteins, m.carbs, m.fats, m.servings, m.time_eaten, m.meal_id, m.category " +
+        String sql = "SELECT m.id, m.daily_log_id, m.name, m.calories, m.proteins, m.carbs, m.fats, " +
+                "m.servings, m.time_eaten, m.meal_id, m.category " +
                 "FROM meal_entry m " +
                 "JOIN daily_log d ON m.daily_log_id = d.id " +
                 "WHERE d.user_id = ? AND d.log_date = ? " +
@@ -240,8 +241,9 @@ public class Database {
                     int servings = rs.getInt("servings");
                     String category = rs.getString("category");
                     String timeEaten = rs.getString("time_eaten");
+                    int mealId = rs.getInt("meal_id");
 
-                    MealEntry entry = new MealEntry(id, name, calories, proteins, carbs, fats, servings, category, timeEaten);
+                    MealEntry entry = new MealEntry(id, name, calories, proteins, carbs, fats, servings, category, timeEaten, mealId);
                     mealList.add(entry);
                 }
             }

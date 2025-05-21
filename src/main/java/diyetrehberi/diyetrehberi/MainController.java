@@ -14,16 +14,32 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
+
+import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
+
+import javafx.scene.control.Label;
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 
 public class MainController implements Initializable {
 
@@ -483,6 +499,29 @@ public class MainController implements Initializable {
             totalProtein += entry.getProteins();
             totalFat += entry.getFats();
 
+            // Resim yükleme
+            String imagePath = "/Assets/Images/"+entry.getMealId()+".png"; // resources klasöründen erişim için başa '/' koy
+            Image image;
+            try {
+                image = new Image(getClass().getResourceAsStream(imagePath), 50, 50, true, true);
+            } catch (Exception ex) {
+                System.out.println("Resim yüklenemedi: " + imagePath);
+                image = new Image(getClass().getResourceAsStream("/assets/images/default.png"), 50, 50, true, true);
+            }
+            ImageView imageView = new ImageView(image);
+            imageView.setFitWidth(50);
+            imageView.setFitHeight(50);
+            imageView.setPreserveRatio(true);
+
+            Rectangle clip = new Rectangle(50, 50);
+            clip.setArcWidth(15);
+            clip.setArcHeight(15);
+
+            imageView.setClip(clip);
+
+
+
+            // Etiket
             Label mealLabel = new Label(
                     entry.getName() +
                             " - Kalori: " + entry.getCalories() +
@@ -491,6 +530,7 @@ public class MainController implements Initializable {
                             " g, Yağ: " + entry.getFats() + " g"
             );
 
+            // Silme butonu
             Button deleteButton = new Button("X");
             deleteButton.setOnAction(e -> {
                 boolean success = db.deleteMealEntry(entry.getId());
@@ -501,7 +541,7 @@ public class MainController implements Initializable {
                 }
             });
 
-            HBox row = new HBox(10, mealLabel, deleteButton);
+            HBox row = new HBox(10, imageView, mealLabel, deleteButton);
             mealSummaryBox.getChildren().add(row);
         }
 

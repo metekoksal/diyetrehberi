@@ -97,3 +97,8 @@
     -fx-max-height: USE_COMPUTED_SIZE;
 }
 
+.rounded-image {
+    -fx-border-radius: 10;
+    -fx-padding: 2;
+}
+
