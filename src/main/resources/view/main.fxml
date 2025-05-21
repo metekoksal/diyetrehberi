@@ -3,18 +3,17 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
+
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="diyetrehberi.diyetrehberi.MainController"
+            stylesheets="@dark-theme.css"
             prefHeight="400.0" prefWidth="600.0">
 
     <children>
-
-        <!-- Ana içerik alanı -->
         <StackPane fx:id="contentPane"
                    AnchorPane.topAnchor="0.0"
                    AnchorPane.bottomAnchor="50.0"
@@ -23,13 +22,11 @@
 
             <VBox fx:id="homePanel" alignment="CENTER" spacing="10.0">
                 <Label fx:id="nameLabel" text="🏠 Ana Sayfa"/>
-
                 <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Label fx:id="yAxisLabel" text="Alınan Kalori" style="-fx-font-weight: bold;"/>
+                    <Label fx:id="yAxisLabel" text="Alınan Kalori"/>
                     <ComboBox fx:id="calorieTypeComboBox" prefWidth="150"/>
                     <ComboBox fx:id="dateRangeComboBox" prefWidth="150"/>
                 </HBox>
-
                 <LineChart fx:id="calorieChart" prefWidth="500" prefHeight="300">
                     <xAxis>
                         <CategoryAxis fx:id="xAxis" label="Tarih"/>
@@ -40,16 +37,13 @@
                 </LineChart>
             </VBox>
 
-            <VBox fx:id="exercisePanel" alignment="TOP_CENTER" visible="false">
-                <HBox spacing="10.0" alignment="TOP_CENTER">
-                    <!-- Sol: Dinamik Yemek Seçme Alanı -->
-                    <VBox alignment="CENTER" prefWidth="280.0" spacing="10.0">
-                        <Label text="💪 Egzersiz Kaydı Ekle" style="-fx-font-size: 16px; -fx-font-weight: bold;" AnchorPane.topAnchor="0.0"/>
-
-                        <!-- Dinamik olarak kodda eklenecek ComboBox -->
+            <VBox fx:id="exercisePanel"
+                  AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                <HBox spacing="10.0" alignment="TOP_CENTER" VBox.vgrow="ALWAYS">
+                    <VBox alignment="TOP_CENTER" prefWidth="280.0" spacing="10.0">
+                        <Label text="💪 Egzersiz Kaydı Ekle"/>
                         <ComboBox fx:id="exerciseComboBox" promptText="Egzersiz Seçin" prefWidth="200.0"/>
-
-                        <!-- Porsiyon girişi -->
                         <VBox spacing="5.0" alignment="TOP_LEFT">
                             <HBox spacing="5.0" alignment="CENTER_LEFT">
                                 <Label text="Dakika:"/>
@@ -57,109 +51,77 @@
                             </HBox>
                             <Label fx:id="caloriesBurnedLabel" text="Yakılan Kalori: 0 kcal"/>
                             <HBox spacing="5.0" alignment="CENTER_LEFT">
-                                <Label text = "Yapılan Zaman: "/>
-
+                                <Label text="Yapılan Zaman:"/>
                                 <ComboBox fx:id="hourComboBoxExercise" promptText="Saat" prefWidth="65.0"/>
-                                <Label text = ":"/>
+                                <Label text=":"/>
                                 <ComboBox fx:id="minuteComboBoxExercise" promptText="Dk." prefWidth="65.0"/>
                             </HBox>
                         </VBox>
-
-                        <!-- Ekle butonu -->
                         <Button fx:id="addExerciseButton" text="➕ Ekle" onAction="#handleLogExercise"/>
                     </VBox>
 
+                    <Pane fx:id="exerciseVLine" VBox.vgrow="ALWAYS" HBox.hgrow="NEVER"/>
 
-                    <!-- Orta Çizgi -->
-                    <Pane prefWidth="2.0" style="-fx-background-color: #cccccc;" />
-
-                    <!-- Sağ: Besin Değerleri Özeti -->
                     <VBox alignment="TOP_CENTER" prefWidth="280.0" spacing="10.0">
-                        <Label text="📋 Özet" style="-fx-font-size: 16px; -fx-font-weight: bold;" AnchorPane.topAnchor="0.0"/>
-                        <!-- Buraya dinamik liste gelecek -->
+                        <Label text="📋 Özet"/>
                         <VBox fx:id="exerciseSummaryBox" spacing="5.0" prefWidth="260.0"/>
                     </VBox>
-
                 </HBox>
             </VBox>
 
-            <VBox fx:id="foodPanel" alignment="TOP_CENTER" visible="false">
-                <HBox spacing="10.0" alignment="TOP_CENTER">
-                    <!-- Sol: Dinamik Yemek Seçme Alanı -->
-                    <VBox alignment="CENTER" prefWidth="280.0" spacing="10.0">
-                        <Label text="🍽 Yemek Kaydı Ekle" style="-fx-font-size: 16px; -fx-font-weight: bold;" AnchorPane.topAnchor="0.0"/>
-
-                        <!-- Dinamik olarak kodda eklenecek ComboBox -->
+            <VBox fx:id="foodPanel"
+                  AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                <HBox spacing="10.0" alignment="TOP_CENTER" VBox.vgrow="ALWAYS">
+                    <VBox alignment="TOP_CENTER" prefWidth="280.0" spacing="10.0">
+                        <Label text="🍽 Yemek Kaydı Ekle"/>
                         <ComboBox fx:id="foodComboBox" promptText="Yemek Seçin" prefWidth="200.0"/>
-
-                        <!-- Porsiyon girişi -->
                         <VBox spacing="5.0" alignment="TOP_LEFT">
                             <HBox spacing="5.0" alignment="CENTER_LEFT">
                                 <Label text="Porsiyon:"/>
                                 <TextField fx:id="portionField" text="1" prefWidth="60.0"/>
                             </HBox>
-
                             <Label fx:id="caloriesLabel" text="Kalori: 0 kcal"/>
                             <Label fx:id="carbsLabel" text="Karbonhidrat: 0 g"/>
                             <Label fx:id="proteinLabel" text="Protein: 0 g"/>
                             <Label fx:id="fatLabel" text="Yağ: 0 g"/>
-
                             <HBox spacing="5.0" alignment="CENTER_LEFT">
-                                <Label text = "Yenilen Zaman: "/>
-
+                                <Label text="Yenilen Zaman:"/>
                                 <ComboBox fx:id="hourComboBoxMeal" promptText="Saat" prefWidth="65.0"/>
-                                <Label text = ":"/>
+                                <Label text=":"/>
                                 <ComboBox fx:id="minuteComboBoxMeal" promptText="Dk." prefWidth="65.0"/>
                             </HBox>
                         </VBox>
-
-
-
-                        <!-- Ekle butonu -->
                         <Button fx:id="addMealButton" text="➕ Ekle" onAction="#handleLogMeal"/>
                     </VBox>
 
+                    <Pane fx:id="foodVLine" VBox.vgrow="ALWAYS" HBox.hgrow="NEVER"/>
 
-                    <!-- Orta Çizgi -->
-                    <Pane prefWidth="2.0" style="-fx-background-color: #cccccc;" />
-
-                    <!-- Sağ: Besin Değerleri Özeti -->
                     <VBox alignment="TOP_CENTER" prefWidth="280.0" spacing="10.0">
-                        <Label text="📋 Özet" style="-fx-font-size: 16px; -fx-font-weight: bold;" AnchorPane.topAnchor="0.0"/>
-                        <!-- Buraya dinamik liste gelecek -->
+                        <Label text="📋 Özet"/>
                         <VBox fx:id="mealSummaryBox" spacing="5.0" prefWidth="260.0"/>
                     </VBox>
                 </HBox>
             </VBox>
 
-
-            <VBox fx:id="profilePanel" alignment="CENTER" visible="false">
+            <VBox fx:id="profilePanel" alignment="CENTER" visible="false" styleClass="profile-card">
                 <Label text="👤 Profil"/>
-
-                <!-- Hoşgeldin kısmı -->
                 <Label fx:id="userNameLabel" text="Hoşgeldin [Kullanıcı Adı]"/>
-
-                <!-- Yaş, Cinsiyet, Ağırlık ve Uzunluk bilgilerinin gösterilmesi -->
-                <Label fx:id="ageLabel" text="Yaş: [Yaş]" />
-                <Label fx:id="genderLabel" text="Cinsiyet: [Cinsiyet]" />
-
-                <!-- Ağırlık ve Uzunluk: Etiket ve Input alanları -->
-                <HBox alignment="CENTER">
-                    <Label text="Ağırlık: " />
-                    <Label fx:id="weightLabel" text="XX kg" />
-                    <TextField fx:id="weightField" visible="false" promptText="Yeni Ağırlık" />
-                    <!-- Replaced 'Düzenle' with a pencil emoji -->
+                <Label fx:id="ageLabel" text="Yaş: [Yaş]"/>
+                <Label fx:id="genderLabel" text="Cinsiyet: [Cinsiyet]"/>
+                <HBox alignment="CENTER" spacing="10">
+                    <Label text="Ağırlık:"/>
+                    <Label fx:id="weightLabel" text="XX kg" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <TextField fx:id="weightField" visible="false" managed="false" promptText="Yeni Ağırlık"/>
                     <Button fx:id="editWeightBtn" text="📝" onAction="#handleEditWeight"/>
                 </HBox>
 
-                <HBox alignment="CENTER">
-                    <Label text="Uzunluk: " />
-                    <Label fx:id="heightLabel" text="XX cm" />
-                    <TextField fx:id="heightField" visible="false" promptText="Yeni Uzunluk" />
-                    <!-- Replaced 'Düzenle' with a pencil emoji -->
+                <HBox alignment="CENTER" spacing="10">
+                    <Label text="Uzunluk:"/>
+                    <Label fx:id="heightLabel" text="XX cm" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <TextField fx:id="heightField" visible="false" managed="false" promptText="Yeni Ağırlık"/>
                     <Button fx:id="editHeightBtn" text="📝" onAction="#handleEditHeight"/>
                 </HBox>
-
             </VBox>
 
             <VBox fx:id="settingsPanel" alignment="CENTER" visible="false">
@@ -168,9 +130,7 @@
             </VBox>
         </StackPane>
 
-        <!-- Alt Navigasyon Menüsü -->
-        <HBox alignment="CENTER" spacing="15.0"
-              style="-fx-background-color: #f0f0f0; -fx-padding: 10px;"
+        <HBox fx:id="bottomNav" alignment="CENTER" spacing="15.0"
               AnchorPane.bottomAnchor="0.0"
               AnchorPane.leftAnchor="0.0"
               AnchorPane.rightAnchor="0.0">
@@ -180,6 +140,5 @@
             <Button text="👤" onAction="#handleProfile"/>
             <Button text="⚙" onAction="#handleSettings"/>
         </HBox>
-
     </children>
 </AnchorPane>

@@ -1,0 +1,99 @@
+.root {
+    -fx-base: #2b2b2b;
+    -fx-background: #2b2b2b;
+    -fx-control-inner-background: #3c3f41;
+    -fx-accent: #009688;
+    -fx-focus-color: #009688;
+    -fx-faint-focus-color: transparent;
+    -fx-text-fill: white;
+}
+
+.label {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+.text-field, .combo-box {
+    -fx-background-color: #3c3f41;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #888;
+    -fx-border-color: #555;
+}
+
+.combo-box .label {
+    -fx-text-fill: white;
+}
+
+.button {
+    -fx-background-color: #009688;
+    -fx-text-fill: white;
+}
+
+.button:hover {
+    -fx-background-color: #00bfa5;
+}
+
+.navigation, #bottomNav {
+    -fx-background-color: #333333;
+    -fx-padding: 10px;
+}
+
+#exerciseVLine, #foodVLine {
+    -fx-background-color: #555;
+    -fx-pref-width: 2px;
+    -fx-min-width: 2px;
+    -fx-max-width: 2px;
+}
+
+.section-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.input-field {
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #999999;
+    -fx-border-color: #444;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 6 8;
+}
+
+.choice-box {
+    -fx-background-color: #2b2b2b;
+    -fx-mark-color: white;
+    -fx-text-fill: white;
+    -fx-border-color: #444;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.form-label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.status-label {
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+}
+
+.profile-card {
+    -fx-background-color: #3c3f41;
+    -fx-padding: 20;
+    -fx-spacing: 10;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: #555;
+    -fx-border-width: 2;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 10, 0, 0, 2);
+    -fx-max-width: 300;
+    -fx-min-width: 300;
+    /* yüksekliği içerik kadar bırak */
+    -fx-pref-height: USE_COMPUTED_SIZE;
+    -fx-max-height: USE_COMPUTED_SIZE;
+}
+

@@ -54,7 +54,8 @@ public class MainController implements Initializable {
     @FXML
     private CategoryAxis xAxis;
 
-
+    private boolean weightFieldActionSet = false;
+    private boolean heightFieldActionSet = false;
 
     // Yemek verileri için harita
     private Map<String, FoodItem> foodMap = new HashMap<>();
@@ -146,52 +147,72 @@ public class MainController implements Initializable {
     private void handleEditWeight() {
         weightField.setText(weightLabel.getText().replace(" kg", ""));
         weightField.setVisible(true);
+        weightField.setManaged(true);
         weightLabel.setVisible(false);
+        weightLabel.setManaged(false);
         weightField.requestFocus();
 
-        weightField.setOnAction(event -> {
-            try {
-                double newWeight = Double.parseDouble(weightField.getText());
-                if (newWeight > 0) {
-                    Database db = Database.getInstance();
-                    int userId = db.getCurrentUserId();
-                    db.updateUserWeight(userId, newWeight);
-                    weightLabel.setText(newWeight + " kg");
-                    weightLabel.setVisible(true);
-                    weightField.setVisible(false);
-                } else {
-                    showError("Geçersiz ağırlık değeri.");
+        if (!weightFieldActionSet) {
+            weightField.setOnAction(event -> {
+                try {
+                    double newWeight = Double.parseDouble(weightField.getText());
+                    if (newWeight > 0) {
+                        Database db = Database.getInstance();
+                        int userId = db.getCurrentUserId();
+                        db.updateUserWeight(userId, newWeight);
+                        weightLabel.setText(newWeight + " kg");
+
+                        // TextField gizle, label göster
+                        weightField.setVisible(false);
+                        weightField.setManaged(false);
+                        weightLabel.setVisible(true);
+                        weightLabel.setManaged(true);
+                        weightField.clear();
+                    } else {
+                        showError("Geçersiz ağırlık değeri.");
+                    }
+                } catch (NumberFormatException e) {
+                    showError("Lütfen geçerli bir sayı girin.");
                 }
-            } catch (NumberFormatException e) {
-                showError("Lütfen geçerli bir sayı girin.");
-            }
-        });
+            });
+            weightFieldActionSet = true;
+        }
     }
 
     @FXML
     private void handleEditHeight() {
         heightField.setText(heightLabel.getText().replace(" cm", ""));
         heightField.setVisible(true);
+        heightField.setManaged(true);
         heightLabel.setVisible(false);
+        heightLabel.setManaged(false);
         heightField.requestFocus();
 
-        heightField.setOnAction(event -> {
-            try {
-                double newHeight = Double.parseDouble(heightField.getText());
-                if (newHeight > 0) {
-                    Database db = Database.getInstance();
-                    int userId = db.getCurrentUserId();
-                    db.updateUserHeight(userId, newHeight);
-                    heightLabel.setText(newHeight + " cm");
-                    heightLabel.setVisible(true);
-                    heightField.setVisible(false);
-                } else {
-                    showError("Geçersiz boy değeri.");
+        if (!heightFieldActionSet) {
+            heightField.setOnAction(event -> {
+                try {
+                    double newHeight = Double.parseDouble(heightField.getText());
+                    if (newHeight > 0) {
+                        Database db = Database.getInstance();
+                        int userId = db.getCurrentUserId();
+                        db.updateUserHeight(userId, newHeight);
+                        heightLabel.setText(newHeight + " cm");
+
+                        // TextField gizle, label göster
+                        heightField.setVisible(false);
+                        heightField.setManaged(false);
+                        heightLabel.setVisible(true);
+                        heightLabel.setManaged(true);
+                        heightField.clear();
+                    } else {
+                        showError("Geçersiz boy değeri.");
+                    }
+                } catch (NumberFormatException e) {
+                    showError("Lütfen geçerli bir sayı girin.");
                 }
-            } catch (NumberFormatException e) {
-                showError("Lütfen geçerli bir sayı girin.");
-            }
-        });
+            });
+            heightFieldActionSet = true;
+        }
     }
 
     @FXML

@@ -1,37 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="diyetrehberi.diyetrehberi.SignupController"
+            stylesheets="@dark-theme.css"
             prefHeight="400.0" prefWidth="600.0">
 
-    <children>
-        <VBox fx:id="vbox" alignment="CENTER" spacing="10.0" prefWidth="400.0"
-              AnchorPane.topAnchor="50.0" AnchorPane.bottomAnchor="50.0"
-              AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
-            <TextField fx:id="nameField" promptText="Adınızı girin" />
-            <TextField fx:id="ageField" promptText="Yaşınızı girin" />
-            <HBox spacing="10.0">
-                <Label text="Cinsiyet:" />
-                <ChoiceBox fx:id="genderChoice">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="Erkek" />
-                            <String fx:value="Kadın" />
-                        </FXCollections>
-                    </items>
-                </ChoiceBox>
-            </HBox>
-            <TextField fx:id="emailField" promptText="E-posta adresinizi girin" />
-            <TextField fx:id="heightField" promptText="Boy (cm)" />
-            <TextField fx:id="weightField" promptText="Kilo (kg)" />
-            <Button text="Kaydol" onAction="#onSignupClicked" />
-            <Label fx:id="statusLabel"/>
-        </VBox>
-    </children>
+    <VBox fx:id="vbox" alignment="CENTER" spacing="10.0" prefWidth="400.0"
+          AnchorPane.topAnchor="50.0" AnchorPane.bottomAnchor="50.0"
+          AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
+
+        <TextField fx:id="nameField" promptText="Adınızı girin" styleClass="input-field" />
+        <TextField fx:id="ageField" promptText="Yaşınızı girin" styleClass="input-field" />
+
+        <HBox spacing="10.0" alignment="CENTER_LEFT">
+            <Label text="Cinsiyet:" styleClass="form-label" />
+            <ChoiceBox fx:id="genderChoice" styleClass="choice-box">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="Erkek" />
+                        <String fx:value="Kadın" />
+                    </FXCollections>
+                </items>
+            </ChoiceBox>
+        </HBox>
+
+        <TextField fx:id="emailField" promptText="E-posta adresinizi girin" styleClass="input-field" />
+        <TextField fx:id="heightField" promptText="Boy (cm)" styleClass="input-field" />
+        <TextField fx:id="weightField" promptText="Kilo (kg)" styleClass="input-field" />
+
+        <Button text="Kaydol" onAction="#onSignupClicked" styleClass="primary-button" />
+        <Label fx:id="statusLabel" styleClass="status-label"/>
+    </VBox>
 </AnchorPane>
