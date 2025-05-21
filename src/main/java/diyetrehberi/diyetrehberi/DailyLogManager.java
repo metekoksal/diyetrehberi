@@ -82,43 +82,4 @@ public class DailyLogManager {
         }
     }
 
-    // TEST METODU
-/*
-    public static void main(String[] args) {
-        try {
-            DailyLogManager logManager = new DailyLogManager();
-            int userId = 1;
-
-            //for daily log time (today)
-            LocalDate today = LocalDate.now();
-            // creates daily log
-            int dailyLogId = logManager.createDailyLog(userId, today);
-
-            // create new meal entry
-            //MealEntry meal = new MealEntry(10, 1);
-
-            // create new exercise entry
-            ExerciseEntry exercise = new ExerciseEntry(3, 30);
-
-            // örnek saat init
-            int hour = 9, minute = 30;
-            long msSinceMidnight = (hour*60+minute)*60*1000;
-            // sql.Time unix time'dan beri geçen ms gösteriyor (Time türünde), saat için değer doğrudan alınabilir
-            Time sqlTime = new Time(msSinceMidnight);
-
-            // log meal at a specific time on daily log dailyLogId
-            //logManager.logMeal(dailyLogId, meal, sqlTime);
-
-            // log exercise at a specific time on daily log dailyLogID
-            logManager.logExercise(3, exercise, sqlTime);
-
-            //debug print
-            System.out.println(logManager.getDailyLogId(userId, today) + "id'li günlük log'a kayıt eklendi. ID:" + exercise.getId());
-
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
-
- */
 }
