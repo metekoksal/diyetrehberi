@@ -640,7 +640,11 @@ public class MainController implements Initializable {
                 categories.add(temp.format(formatter));
                 temp = temp.plusDays(1);
             }
-            xAxis.setCategories(FXCollections.observableArrayList(categories));
+            try {
+                xAxis.setCategories(FXCollections.observableArrayList(categories));
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         });
     }
 
