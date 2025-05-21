@@ -52,9 +52,9 @@
                             <Label fx:id="caloriesBurnedLabel" text="Yakılan Kalori: 0 kcal"/>
                             <HBox spacing="5.0" alignment="CENTER_LEFT">
                                 <Label text="Yapılan Zaman:"/>
-                                <ComboBox fx:id="hourComboBoxExercise" promptText="Saat" prefWidth="65.0"/>
+                                <ComboBox fx:id="hourComboBoxExercise" promptText="Saat" prefWidth="75.0"/>
                                 <Label text=":"/>
-                                <ComboBox fx:id="minuteComboBoxExercise" promptText="Dk." prefWidth="65.0"/>
+                                <ComboBox fx:id="minuteComboBoxExercise" promptText="Dk." prefWidth="75.0"/>
                             </HBox>
                         </VBox>
                         <Button fx:id="addExerciseButton" text="➕ Ekle" onAction="#handleLogExercise"/>
@@ -87,9 +87,9 @@
                             <Label fx:id="fatLabel" text="Yağ: 0 g"/>
                             <HBox spacing="5.0" alignment="CENTER_LEFT">
                                 <Label text="Yenilen Zaman:"/>
-                                <ComboBox fx:id="hourComboBoxMeal" promptText="Saat" prefWidth="65.0"/>
+                                <ComboBox fx:id="hourComboBoxMeal" promptText="Saat" prefWidth="75.0"/>
                                 <Label text=":"/>
-                                <ComboBox fx:id="minuteComboBoxMeal" promptText="Dk." prefWidth="65.0"/>
+                                <ComboBox fx:id="minuteComboBoxMeal" promptText="Dk." prefWidth="75.0"/>
                             </HBox>
                         </VBox>
                         <Button fx:id="addMealButton" text="➕ Ekle" onAction="#handleLogMeal"/>
