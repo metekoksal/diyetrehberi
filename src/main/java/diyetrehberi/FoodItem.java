@@ -1,4 +1,4 @@
-package diyetrehberi.diyetrehberi;
+package diyetrehberi;
 
 public class FoodItem {
     private String name, kategori;

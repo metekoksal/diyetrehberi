@@ -1,4 +1,4 @@
-package diyetrehberi.diyetrehberi;
+package diyetrehberi;
 
 public abstract class Entry implements Trackable{
 

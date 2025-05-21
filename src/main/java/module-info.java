@@ -7,6 +7,6 @@ module diyetrehberi.diyetrehberi {
     requires java.sql;
     requires jdk.unsupported.desktop;
 
-    opens diyetrehberi.diyetrehberi to javafx.fxml;
-    exports diyetrehberi.diyetrehberi;
+    opens diyetrehberi to javafx.fxml;
+    exports diyetrehberi;
 }

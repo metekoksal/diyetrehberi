@@ -1,4 +1,4 @@
-package diyetrehberi.diyetrehberi;
+package diyetrehberi;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

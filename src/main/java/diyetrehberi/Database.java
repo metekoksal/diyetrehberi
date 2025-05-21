@@ -1,9 +1,8 @@
-package diyetrehberi.diyetrehberi;
+package diyetrehberi;
 
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;

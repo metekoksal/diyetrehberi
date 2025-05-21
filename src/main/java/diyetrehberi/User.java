@@ -1,4 +1,4 @@
-package diyetrehberi.diyetrehberi;
+package diyetrehberi;
 
 public class User {
     private String name;

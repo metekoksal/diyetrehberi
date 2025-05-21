@@ -99,7 +99,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>diyetrehberi.diyetrehberi/diyetrehberi.diyetrehberi.MainApplication</mainClass>
+                            <mainClass>diyetrehberi.diyetrehberi/diyetrehberi.MainApplication</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>
