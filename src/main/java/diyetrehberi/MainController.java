@@ -301,33 +301,39 @@ public class MainController implements Initializable {
         ExerciseItem item = exerciseMap.get(exerciseComboBox.getValue());
 
         int duration = 1;
+        int errorFlag = 0;
         try{
             String durationText = durationField.getText();
             if(!durationText.isBlank()){
                 duration = Math.abs(Integer.parseInt(durationText));
             }
         } catch(NumberFormatException e){
-            duration = 0;
-        }
-
-        try{
-            ExerciseEntry exerciseentry = new ExerciseEntry(item.getExerciseId(), duration);
-
-            int hourDone = Integer.parseInt(hourComboBoxExercise.getValue());
-            int minuteDone = Integer.parseInt(minuteComboBoxExercise.getValue());
-
-            DailyLogManager logManager = new DailyLogManager();
-            int userId = db.getCurrentUserId();
-            LocalDate today = LocalDate.now();
-            int dailyLogId = logManager.createDailyLog(userId, today);
-            long msSinceMidnight = (hourDone*60 +minuteDone)*60*1000;
-            Time sqlTime = new Time(msSinceMidnight);
-            // log exercise
-            logManager.logExercise(dailyLogId, exerciseentry, sqlTime);
-            updateExerciseSummaryBox();
-        } catch (Exception e) {
             System.out.println(e);
+            showError("Lütfen geçerli bir sayı girin.");
+            errorFlag = 1;
         }
+
+        if(errorFlag == 0){
+            try{
+                ExerciseEntry exerciseentry = new ExerciseEntry(item.getExerciseId(), duration);
+
+                int hourDone = Integer.parseInt(hourComboBoxExercise.getValue());
+                int minuteDone = Integer.parseInt(minuteComboBoxExercise.getValue());
+
+                DailyLogManager logManager = new DailyLogManager();
+                int userId = db.getCurrentUserId();
+                LocalDate today = LocalDate.now();
+                int dailyLogId = logManager.createDailyLog(userId, today);
+                long msSinceMidnight = (hourDone*60 +minuteDone)*60*1000;
+                Time sqlTime = new Time(msSinceMidnight);
+                // log exercise
+                logManager.logExercise(dailyLogId, exerciseentry, sqlTime);
+                updateExerciseSummaryBox();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+
 
 
     }
@@ -338,34 +344,39 @@ public class MainController implements Initializable {
 
         //get portion text field value as int (number format exception - default to 1)
         int portion = 1;
+        int errorFlag = 0;
         try {
             String portionText = portionField.getText();
             if (!portionText.isBlank()) {
                 portion = Math.abs(Integer.parseInt(portionText));
             }
         } catch (NumberFormatException e) {
-            portion = 0;
-        }
-
-        try{
-            MealEntry mealentry = new MealEntry(item.getFoodid(), portion);
-
-            // set hour & minute from selected vaules in combo boxes
-            int hourEaten = Integer.parseInt(hourComboBoxMeal.getValue());
-            int minuteEaten = Integer.parseInt(minuteComboBoxMeal.getValue());
-
-            DailyLogManager logManager = new DailyLogManager();
-            int userId = db.getCurrentUserId();
-            LocalDate today = LocalDate.now();
-            int dailyLogId = logManager.createDailyLog(userId, today);
-            long msSinceMidnight = (hourEaten*60 +minuteEaten)*60*1000;
-            Time sqlTime = new Time(msSinceMidnight);
-            //log meal
-            logManager.logMeal(dailyLogId, mealentry, sqlTime);
-            updateMealSummaryBox();
-        } catch (Exception e){
             System.out.println(e);
+            showError("Lütfen geçerli bir sayı girin.");
+            errorFlag = 1;
         }
+        if(errorFlag == 0){
+            try{
+                MealEntry mealentry = new MealEntry(item.getFoodid(), portion);
+
+                // set hour & minute from selected vaules in combo boxes
+                int hourEaten = Integer.parseInt(hourComboBoxMeal.getValue());
+                int minuteEaten = Integer.parseInt(minuteComboBoxMeal.getValue());
+
+                DailyLogManager logManager = new DailyLogManager();
+                int userId = db.getCurrentUserId();
+                LocalDate today = LocalDate.now();
+                int dailyLogId = logManager.createDailyLog(userId, today);
+                long msSinceMidnight = (hourEaten*60 +minuteEaten)*60*1000;
+                Time sqlTime = new Time(msSinceMidnight);
+                //log meal
+                logManager.logMeal(dailyLogId, mealentry, sqlTime);
+                updateMealSummaryBox();
+            } catch (Exception e){
+                System.out.println(e);
+            }
+        }
+
     }
 
     // yemeğin kaçta yenildiğini ve egzersizin kaçta yapıldığını gösteren combo boxları doldurur
