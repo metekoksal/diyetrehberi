@@ -42,7 +42,7 @@ public class MainController implements Initializable {
             caloriesLabel, carbsLabel, proteinLabel, fatLabel, caloriesBurnedLabel, yAxisLabel;
 
     @FXML
-    private TextField weightField, heightField, portionField, durationField;
+    private TextField weightField,ageField, heightField, portionField, durationField;
 
     @FXML
     private ComboBox<String> foodComboBox, exerciseComboBox,
@@ -63,6 +63,8 @@ public class MainController implements Initializable {
 
     private boolean weightFieldActionSet = false;
     private boolean heightFieldActionSet = false;
+    private boolean ageFieldActionSet = false;
+
 
     // Yemek verileri için harita
     private Map<String, FoodItem> foodMap = new HashMap<>();
@@ -104,7 +106,7 @@ public class MainController implements Initializable {
 
         if (user != null) {
             userNameLabel.setText("Hoşgeldin " + user.getName());
-            ageLabel.setText("Yaş: " + user.getAge());
+            ageLabel.setText("" + user.getAge());
             genderLabel.setText("Cinsiyet: " + user.getGender());
             weightLabel.setText(user.getWeight() + " kg");
             heightLabel.setText(user.getHeight() + " cm");
@@ -219,6 +221,42 @@ public class MainController implements Initializable {
                 }
             });
             heightFieldActionSet = true;
+        }
+    }
+
+    @FXML
+    private void handleEditAge() {
+        ageField.setText(ageLabel.getText().replace("", ""));
+        ageField.setVisible(true);
+        ageField.setManaged(true);
+        ageLabel.setVisible(false);
+        ageLabel.setManaged(false);
+        ageField.requestFocus();
+
+        if (!ageFieldActionSet) {
+            ageField.setOnAction(event -> {
+                try {
+                    Integer newHeight = Integer.parseInt(ageField.getText());
+                    if (newHeight > 0) {
+                        Database db = Database.getInstance();
+                        int userId = db.getCurrentUserId();
+                        db.updateUserAge(userId, newHeight);
+                        ageLabel.setText(newHeight + "");
+
+                        // TextField gizle, label göster
+                        ageField.setVisible(false);
+                        ageField.setManaged(false);
+                        ageLabel.setVisible(true);
+                        ageLabel.setManaged(true);
+                        ageField.clear();
+                    } else {
+                        showError("Geçerli yıl değeri.");
+                    }
+                } catch (NumberFormatException e) {
+                    showError("Lütfen geçerli bir sayı girin.");
+                }
+            });
+            ageFieldActionSet = true;
         }
     }
 

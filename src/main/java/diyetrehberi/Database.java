@@ -131,6 +131,17 @@ public class Database {
             System.out.println(e);
         }
     }
+    public void updateUserAge(int userId, int age) {
+        String sql = "UPDATE users SET age = ? WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setDouble(1, age);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+            System.out.println("age güncellendi: " + age);
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
     // Yemekleri veritabanından yükle
     public Map<String, FoodItem> loadFoodsFromDatabase() {
         Map<String, FoodItem> foodMap = new HashMap<>();

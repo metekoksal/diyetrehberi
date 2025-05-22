@@ -107,8 +107,13 @@
             <VBox fx:id="profilePanel" alignment="CENTER" visible="false" styleClass="profile-card">
                 <Label text="👤 Profil"/>
                 <Label fx:id="userNameLabel" text="Hoşgeldin [Kullanıcı Adı]"/>
-                <Label fx:id="ageLabel" text="Yaş: [Yaş]"/>
                 <Label fx:id="genderLabel" text="Cinsiyet: [Cinsiyet]"/>
+                <HBox alignment="CENTER" spacing="10">
+                    <Label text="Yaş:"/>
+                    <Label fx:id="ageLabel" text="yıl" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <TextField fx:id="ageField" visible="false" managed="false" promptText="Yeni yaş"/>
+                    <Button fx:id="editAgeBtn" text="📝" onAction="#handleEditAge"/>
+                </HBox>
                 <HBox alignment="CENTER" spacing="10">
                     <Label text="Ağırlık:"/>
                     <Label fx:id="weightLabel" text="XX kg" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
