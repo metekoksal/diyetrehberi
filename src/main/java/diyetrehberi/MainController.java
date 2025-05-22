@@ -87,7 +87,7 @@ public class MainController implements Initializable {
         calorieTypeComboBox.getItems().addAll("Alınan Kalori", "Yakılan Kalori", "Egzersiz Süresi");
         calorieTypeComboBox.setValue("Alınan Kalori");
 
-        dateRangeComboBox.getItems().addAll("Son 1 Hafta", "Son 1 Ay", "Son 3 Ay", "Bu Yıl", "Tüm Zamanlar");
+        dateRangeComboBox.getItems().addAll("Son 1 Hafta", "Son 1 Ay", "Son 3 Ay", "Bu Yıl");
         dateRangeComboBox.setValue("Son 1 Hafta");
 
         // Event listener'lar
@@ -616,8 +616,6 @@ public class MainController implements Initializable {
                 return new LocalDate[]{ today.minusMonths(3).plusDays(1), today };
             case "Bu Yıl":
                 return new LocalDate[]{ LocalDate.of(today.getYear(), 1, 1), today };
-            case "Tüm Zamanlar":
-                return new LocalDate[]{ db.getFirstEntryDate(db.getCurrentUserId()), today };
             default:
                 return new LocalDate[]{ today.minusDays(6), today };
         }
