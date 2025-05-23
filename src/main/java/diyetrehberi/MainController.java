@@ -430,6 +430,7 @@ public class MainController implements Initializable {
         fatLabel.setText("Yağ: " + round(item.getYag() * portion) + " g");
     }
 
+    // sayı yuvarlama
     private double round(double val) {
         return Math.round(val * 100.0) / 100.0;
     }
@@ -686,7 +687,7 @@ public class MainController implements Initializable {
         });
     }
 
-    // Hata mesajı göster
+    // ayrı pencerede hata mesajı göster
     private void showError(String message) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle("Hata");

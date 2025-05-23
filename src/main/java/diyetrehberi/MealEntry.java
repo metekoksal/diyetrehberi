@@ -19,8 +19,8 @@ public class MealEntry extends Entry {
         }
     }
 
-    public MealEntry(int id, String name, double calories, double proteins, double carbs, double fats,
-                     int servings, String category, String timeEaten, int mealId) {
+    // her param'ı alan constructor
+    public MealEntry(int id, String name, double calories, double proteins, double carbs, double fats, int servings, String category, String timeEaten, int mealId) {
         super(id);
         setName(name);
         setCalories(calories);
@@ -34,7 +34,7 @@ public class MealEntry extends Entry {
         this.mealId = mealId;
     }
 
-
+    // constructor'da object variable population için db'den veri çekme
     private void loadMealDataFromDatabase(int id, int servings) throws SQLException {
         Connection connection = Database.getInstance().getConnection();
 

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class MainApplication extends Application {
+    //create stage and get instance from singleton db connection
     @Override
     public void start(Stage stage) throws IOException {
         Database db = Database.getInstance();

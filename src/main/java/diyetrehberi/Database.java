@@ -13,10 +13,13 @@ public class Database {
     private static Database instance;
     private Connection connection;
 
+    // db dosya url'i
     private static final String DB_URL = "jdbc:sqlite:diyetrehberi.db";
 
-    private static int currentUserId = -1;  // Store the current user ID after signup
+    //user id init.
+    private static int currentUserId = -1;
 
+    //constructor, singleton veritabanı bağlantısı oluşturmak için
     private Database() {
         try {
             connection = DriverManager.getConnection(DB_URL);
@@ -37,7 +40,7 @@ public class Database {
         return connection;
     }
 
-    // Method to create a user in the database
+    // db'e kullanıcı ekleme
     public void createUser(String name, int age, String gender, String email, double height, double weight) {
         String sql = "INSERT INTO users (name, age, gender, email, height, weight) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -60,8 +63,7 @@ public class Database {
         }
     }
 
-
-    // Method to remove a user from the database
+    // db'den kullanıcı silme
     public void removeUser(int id) {
         String sql = "DELETE FROM users WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -77,7 +79,7 @@ public class Database {
         }
     }
 
-    // Method to get all details of a user based on the ID
+    // get all details of a user based on the ID
     public User getUserDetails(int id) {
         String sql = "SELECT name, age, gender, height, weight FROM users WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -131,6 +133,7 @@ public class Database {
             System.out.println(e);
         }
     }
+
     public void updateUserAge(int userId, int age) {
         String sql = "UPDATE users SET age = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -142,7 +145,8 @@ public class Database {
             System.out.println(e);
         }
     }
-    // Yemekleri veritabanından yükle
+
+    // Yemekleri veritabanından yükleme
     public Map<String, FoodItem> loadFoodsFromDatabase() {
         Map<String, FoodItem> foodMap = new HashMap<>();
 
@@ -169,6 +173,7 @@ public class Database {
         return foodMap;
     }
 
+    // Egzersizleri veritabanından yükleme
     public Map<String, ExerciseItem> loadExercisesFromDatabase() {
         Map<String, ExerciseItem> exerciseMap = new HashMap<>();
         String sql = "SELECT name, category, calories_burned_per_min, exercise_id FROM exercises";
@@ -188,6 +193,7 @@ public class Database {
         return exerciseMap;
     }
 
+    // günlük özet egzersizleri yükleme
     public List<ExerciseEntry> loadTodaysExerciseEntriesForUser(int userId) {
         List<ExerciseEntry> exerciseList = new ArrayList<>();
         String sql = "SELECT e.id, e.daily_log_id, e.name, e.duration, e.calories_burned, e.time_done, e.exercise_id, e.category " +
@@ -225,6 +231,7 @@ public class Database {
         return exerciseList;
     }
 
+    // günlük özet yemekleri yükleme
     public List<MealEntry> loadTodaysMealEntriesForUser(int userId) {
         List<MealEntry> mealList = new ArrayList<>();
         String sql = "SELECT m.id, m.daily_log_id, m.name, m.calories, m.proteins, m.carbs, m.fats, " +
@@ -292,6 +299,8 @@ public class Database {
         }
     }
 
+
+    // grafik için alınan, yakılan kalori ve egzersiz süresi dönerler
     public Map<LocalDate, Integer> getCaloriesConsumedByDate(int userId, LocalDate start, LocalDate end) {
         Map<LocalDate, Integer> result = new HashMap<>();
         String sql = "SELECT dl.log_date, SUM(me.calories) as total_calories FROM meal_entry me " +

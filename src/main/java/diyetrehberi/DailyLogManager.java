@@ -8,6 +8,7 @@ import java.time.LocalDate;
 
 public class DailyLogManager {
 
+    //varsa mevcut kullanıcının daily log'unun id'sini döner, yoksa createDailyLog çağırır
     private int getDailyLogId(int userId, LocalDate date) throws SQLException {
         Connection connection = Database.getInstance().getConnection();
         String sql = "SELECT id FROM daily_log WHERE user_id = ? AND log_date = ?";
@@ -26,6 +27,7 @@ public class DailyLogManager {
         return createDailyLog(userId, date);
     }
 
+    //user id ve bugün için daily log açmaya çalışır, zaten varsa getDailyLogId çağırır
     public int createDailyLog(int userId, LocalDate date) throws SQLException {
         Connection connection = Database.getInstance().getConnection();
         String sql = "INSERT INTO daily_log (user_id, log_date) VALUES (?, ?) " +
@@ -45,6 +47,7 @@ public class DailyLogManager {
         return getDailyLogId(userId, date);
     }
 
+    //db'e yemek kaydı
     public void logMeal(int dailyLogId, MealEntry meal, Time eatenTime) throws SQLException {
         Connection connection = Database.getInstance().getConnection();
         String sql = "INSERT INTO meal_entry (daily_log_id, meal_id, name, calories, proteins, carbs, fats, time_eaten, servings, category) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -65,6 +68,7 @@ public class DailyLogManager {
         }
     }
 
+    //db'e egzersiz kaydı
     public void logExercise(int dailyLogId, ExerciseEntry exercise, Time timeDone) throws SQLException {
         Connection connection = Database.getInstance().getConnection();
         String sql = "INSERT INTO exercise_entry (daily_log_id, exercise_id, name, calories_burned, time_done, duration, category) VALUES (?, ?, ?, ?, ?, ?, ?)";

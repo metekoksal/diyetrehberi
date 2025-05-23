@@ -37,6 +37,7 @@ public class ExerciseEntry extends Entry {
         this.setCategory(category);
     }
 
+    // constructor'da object variable population için db'den veri çekme
     private void loadExerciseDataFromDatabase(int id, int duration) throws SQLException {
         Connection connection = Database.getInstance().getConnection();
         String sql = "SELECT name, calories_burned_per_min, category FROM exercises WHERE exercise_id = ?";

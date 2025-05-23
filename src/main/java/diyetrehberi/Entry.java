@@ -30,7 +30,6 @@ public abstract class Entry implements Trackable{
         this.calories = calories;
     }
 
-    //getters & setters
     public int getId() {
         return id;
     }
